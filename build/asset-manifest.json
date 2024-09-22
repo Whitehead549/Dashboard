@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/static/css/main.fffb8f32.css",
+    "main.js": "/static/js/main.8f736e8f.js",
+    "static/media/main.mp4": "/static/media/main.b35cedce6f3698e89e9a.mp4",
+    "static/media/enginner.jpeg": "/static/media/enginner.f8794e6bb6020e655de5.jpeg",
+    "static/media/travelbox.jpeg": "/static/media/travelbox.a1b7adf0c1893046d040.jpeg",
+    "static/media/cover-women.svg": "/static/media/cover-women.c52545c8a4d643f81a70dfd0e60b623e.svg",
+    "static/media/water.jpg": "/static/media/water.04ba0110bc72a68a4a5d.jpg",
+    "static/media/logo.png": "/static/media/logo.832278de4c91edd2acf9.png",
+    "static/media/boat.jpg": "/static/media/boat.4156d6df4c72e6e95761.jpg",
+    "static/media/tajmahal.jpg": "/static/media/tajmahal.10f22ab29af7a4a2d2e0.jpg",
+    "index.html": "/index.html",
+    "main.fffb8f32.css.map": "/static/css/main.fffb8f32.css.map",
+    "main.8f736e8f.js.map": "/static/js/main.8f736e8f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fffb8f32.css",
+    "static/js/main.8f736e8f.js"
+  ]
+}
