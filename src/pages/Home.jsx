@@ -1,6 +1,6 @@
 // src/pages/Home.js
 import OverviewPage from "../components/common/Overviewpages";
-import TradingViewChart from '../components/utilities/TradingViewChart';
+import TradingViewChart from '../components/Essentials/TradingViewChart';
 const Home = () => {
     return (
       <div className="">
