@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaUser, FaCog, FaMoneyBillWave, FaChartLine, FaHandHoldingUsd, FaHistory, FaEnvelope} from 'react-icons/fa'; // Import icons
+import { FaHome, FaUser, FaMoneyBillWave, FaChartLine, FaHandHoldingUsd, FaHistory, FaEnvelope} from 'react-icons/fa'; // Import icons
 
 const Sidebar = ({ isOpen, onClose }) => {
   return (
@@ -65,12 +65,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               Contact Us
             </Link>
           </li>
-          <li>
-            <Link to="/settings" className="flex items-center px-4 py-2 hover:bg-gray-700 font-semibold text-lg py-3" onClick={onClose}>
-              <FaCog className="mr-3" /> {/* Icon */}
-              Settings
-            </Link>
-          </li>
+          
         </ul>
       </nav>
     </aside>

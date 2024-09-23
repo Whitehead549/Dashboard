@@ -4,12 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDYqnCW4kXrvrqMBJmk95NHrum2eMPKMPA",
-  authDomain: "triplea-5.firebaseapp.com",
-  projectId: "triplea-5",
-  storageBucket: "triplea-5.appspot.com",
-  messagingSenderId: "562360371319",
-  appId: "1:562360371319:web:2c8b3397bf3fa425829e72",
+  apiKey: "AIzaSyALCOkDVnrTCSyi2rTUKoshDwvyY0sMlOQ",
+  authDomain: "testloop500.firebaseapp.com",
+  projectId: "testloop500",
+  storageBucket: "testloop500.appspot.com",
+  messagingSenderId: "860097259860",
+  appId: "1:860097259860:web:f7f4308530c091ff2900c1",
+  measurementId: "G-5V79M6GDVX"
 };
 
 // Initialize Firebase
