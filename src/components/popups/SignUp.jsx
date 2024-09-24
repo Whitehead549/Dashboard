@@ -83,7 +83,7 @@ const Signup = () => {
               <input
                 id="fullName"
                 type="text"
-                className="form-input w-full px-2 py-1 border rounded bg-gray-300 opacity-85"
+                className="form-input w-full px-2 py-1 border rounded bg-gray-400 opacity-70"
                 required
                 onChange={(e) => setFullName(e.target.value)}
                 value={fullName}
