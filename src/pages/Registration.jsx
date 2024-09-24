@@ -21,7 +21,7 @@ const Registration = () => {
                 onClick={handleToggle}
                 className="text-blue-600 hover:underline font-semibold"
               >
-                Create one!
+                Create account!
               </button>
             </div>
           </>
