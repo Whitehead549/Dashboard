@@ -9,11 +9,13 @@ import Investmentplans from './pages/Investmentplans';
 import Withdraws from './pages/Withdraws';
 import History from './pages/History';
 import ContactUs from './pages/ContactUs';
+import Registration from './pages/Registration';
 
 function App() {
   return (
     <Router>
       <Routes>
+      <Route path="Dashboard" element={<Registration />} />
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
