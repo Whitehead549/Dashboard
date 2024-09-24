@@ -11,6 +11,8 @@ const Deposit = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [proceed, setProceed] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); // State to control custom alert modal visibility
+  const MINIMUM_DEPOSIT = 100; // Minimum deposit amount
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -46,7 +48,9 @@ const Deposit = () => {
   };
 
   const handleProceed = () => {
-    if (selectedWallet && amount) {
+    if (amount < MINIMUM_DEPOSIT) {
+      setShowAlert(true); // Show the custom alert modal
+    } else if (selectedWallet && amount >= MINIMUM_DEPOSIT) {
       setProceed(true);
     }
   };
@@ -54,7 +58,7 @@ const Deposit = () => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(walletAddress)
       .then(() => {
-        alert('Wallet address copied to clipboard!'); // Alert the user
+        alert('Wallet address copied to clipboard!');
       })
       .catch(err => {
         console.error('Failed to copy: ', err);
@@ -72,7 +76,7 @@ const Deposit = () => {
             • Ensure to click on the save deposit button below after sending the coin.
           </>
         );
-      case 'USDT(TRC 20)':
+      case 'USDT (TRC 20)':
         return (
           <>
             • Send Only USDT TETHER (TRC20) to this address.<br />
@@ -81,7 +85,7 @@ const Deposit = () => {
             • Ensure to click on the save deposit button below after sending the coin.
           </>
         );
-      case 'USDT (ERC 20)':
+      case 'USDT (ERC 20)':
         return (
           <>
             • Send Only USDT TETHER (ERC20) to this address.<br />
@@ -111,6 +115,22 @@ const Deposit = () => {
     <>
       <h1 className="text-3xl md:text-3xl font-bold text-gray-800 mb-8 font-sans">Deposit</h1>
       <div className="container mx-auto px-4 md:px-8 lg:px-12 py-6 flex flex-col items-center">
+
+        {/* Custom Alert Modal */}
+        {showAlert && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Invalid Deposit Amount</h2>
+              <p className="text-gray-600 mb-4">The minimum deposit amount should be <strong className="font-bold">$100</strong>.</p>
+              <button
+                onClick={() => setShowAlert(false)} // Close the modal
+                className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-center mb-8">
           <iframe
@@ -142,12 +162,12 @@ const Deposit = () => {
               </div>
 
               {selectedWallet && (
-                  <div className="mb-6">
+                <div className="mb-6">
                   {/* Instruction about the minimum deposit amount */}
                   <p className="text-sm text-gray-700 mb-2">
                     The minimum deposit amount is <strong className="font-bold">$100</strong>
                   </p>
-
+                  
                   <label className="block text-gray-600 font-medium mb-2 font-sans" htmlFor="amount">
                     Enter Amount (in USD)
                   </label>
@@ -158,8 +178,9 @@ const Deposit = () => {
                     onChange={(e) => setAmount(e.target.value)}
                     className="w-full border rounded-lg p-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 font-sans"
                     placeholder="Enter amount"
+                    min={MINIMUM_DEPOSIT}
                   />
-                  </div>
+                </div>
               )}
 
               <button
@@ -194,11 +215,8 @@ const Deposit = () => {
                   <FaCopy size={20} />
                 </button>
               </div>
-
-              {/* Conditional rendering of instruction notes */}
-              <div className="mt-4 text-left text-gray-700 text-sm font-sans">
-                {getInstructionNote(selectedWallet.walletType)}
-              </div>
+              {/* Display the instruction note based on the selected wallet type */}
+              <div className="text-sm text-gray-600 mt-4">{getInstructionNote(selectedWallet.walletType)}</div>
             </div>
           )}
         </div>
@@ -216,3 +234,4 @@ const Deposit = () => {
 }
 
 export default Deposit;
+
