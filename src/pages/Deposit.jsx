@@ -213,26 +213,27 @@ const Deposit = () => {
             </>
           ) : (
             <div className="text-center">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Transaction Summary</h2>
-              <div className="mb-2">
-                <span className="font-medium text-gray-700">Selected Wallet Type:</span>
-                <div className="text-lg font-semibold text-blue-600">{selectedWallet.walletType}</div>
-              </div>
-              <div className="mb-2">
-                <span className="font-medium text-gray-700">Amount:</span>
-                <div className="text-lg font-semibold text-blue-600">${amount}</div>
-              </div>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Wallet Address</h2>
-              <div className="flex items-center justify-center gap-2">
-                <div className="text-sm font-mono p-2 bg-gray-100 rounded-lg border border-gray-300 mb-2 sm:mb-0">
-                  {walletAddress}
-                </div>
-                <button onClick={copyToClipboard} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                  <FaCopy size={20} />
-                </button>
-              </div>
-              <div className="text-sm text-gray-600 mt-4">{getInstructionNote(selectedWallet.walletType)}</div>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 font-sans">Transaction Summary</h2>
+            <div className="mb-1">
+              <span className="font-medium text-gray-700">Selected Wallet Type:</span>
+              <div className="text-base font-semibold text-blue-600">{selectedWallet.walletType}</div>
             </div>
+            <div className="mb-1">
+              <span className="font-medium text-gray-700">Amount:</span>
+              <div className="text-base font-semibold text-blue-600">${amount}</div>
+            </div>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 font-sans">Wallet Address</h2>
+            <div className="flex items-center justify-center gap-1">
+              <div className="text-sm font-mono p-1 bg-gray-100 rounded-lg border border-gray-300 mb-1 sm:mb-0">
+                {walletAddress}
+              </div>
+              <button onClick={copyToClipboard} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                <FaCopy size={20} />
+              </button>
+            </div>
+            <div className="text-sm text-gray-600 mt-2">{getInstructionNote(selectedWallet.walletType)}</div>
+          </div>
+          
           )}
         </div>
 
