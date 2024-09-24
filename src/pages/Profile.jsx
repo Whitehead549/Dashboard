@@ -9,7 +9,7 @@ const Profile = () => {
       // Prevents the default action (which may include the default refresh)
       event.preventDefault();
       // Navigate to a desired route or reload the current route
-      navigate('profile'); // Replace with your actual route
+      navigate(0); // Replace with your actual route
     };
 
     // Add event listener for page reload
