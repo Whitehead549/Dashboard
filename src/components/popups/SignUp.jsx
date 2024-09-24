@@ -61,56 +61,52 @@ const Signup = () => {
   };
 
   return (
-    <div className="p-2 max-w-md w-full" style={{ background: 'rgb(105, 105, 105)' }}>
+    <div className="bg-white px-6 py-4 sm:p-8 md:p-10 lg:p-6 max-w-md w-full mx-auto ">
       {loading ? (
         // Loader spinner centered on the page
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 pl-8">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
           <LoaderSpinner />
         </div>
       ) : (
         // Sign up form when not loading
         <>
-          <h1 className="text-xl font-semibold mb-2 text-center">Sign up</h1>
-          <hr className="mb-2" />
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-6 text-center">Sign Up</h1>
+          <hr className="mb-4" />
           {successMsg && (
-            <div className="bg-green-100 text-green-700 p-2 mb-2 rounded">{successMsg}</div>
+            <div className="bg-green-50 border border-green-400 text-green-600 p-3 rounded mb-4">
+              {successMsg}
+            </div>
           )}
-          <form className="space-y-3" autoComplete="off" onSubmit={handleSignup}>
+          <form className="space-y-6" autoComplete="off" onSubmit={handleSignup}>
             <div>
-              <label htmlFor="fullName" className="block mb-1">
-                Username
-              </label>
+              <label htmlFor="fullName" className="block text-gray-700 mb-2">Username</label>
               <input
                 id="fullName"
                 type="text"
-                className="form-input w-full px-2 py-1 border rounded bg-gray-400 opacity-70"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
                 onChange={(e) => setFullName(e.target.value)}
                 value={fullName}
               />
             </div>
             <div>
-              <label htmlFor="email" className="block mb-1">
-                Email
-              </label>
+              <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
               <input
                 id="email"
                 type="email"
-                className="form-input w-full px-2 py-1 border rounded bg-gray-400 opacity-70"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
               />
             </div>
             <div>
-              <label htmlFor="password" className="block mb-1">
-                Password
-              </label>
+              <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
               <div className="relative">
                 <input
                   id="password"
                   type={passwordVisible ? "text" : "password"}
-                  className="form-input w-full px-2 py-1 border rounded bg-gray-400 opacity-70"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   onChange={(e) => setPassword(e.target.value)}
                   value={password}
@@ -118,24 +114,24 @@ const Signup = () => {
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-2 top-2 text-gray-600"
+                  className="absolute right-4 top-2 text-gray-600"
                 >
                   {passwordVisible ? "🙈" : "👁️"}
                 </button>
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <button
-                type="submit"
-                className={`bg-blue-600 text-gray-300 px-2 py-1 rounded ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-                disabled={loading} // Disable button while loading
-              >
-                Sign up
-              </button>
-            </div>
+            <button
+              type="submit"
+              className={`w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={loading} // Disable button while loading
+            >
+              Sign Up
+            </button>
           </form>
           {errorMsg && (
-            <div className="bg-red-100 text-red-700 p-2 mt-2 rounded">{errorMsg}</div>
+            <div className="bg-red-50 border border-red-400 text-red-600 p-3 rounded mt-4">
+              {errorMsg}
+            </div>
           )}
         </>
       )}

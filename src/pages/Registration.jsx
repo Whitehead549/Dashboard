@@ -10,17 +10,16 @@ const Registration = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 ">
-      <div className="rounded-lg p-4 shadow-lg w-full max-w-md sm:w-full" style={{ background: 'rgb(105, 105, 105)' }}
-      >
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-800 via-gray-700 to-teal-400 p-4 rounded-lg shadow-md">
+      <div className="bg-white shadow-lg rounded-lg p-2 max-w-md w-full mx-2">
         {showLogin ? (
           <>
             <Login />
-            <div className="text-center mt-2">
-              <span>Don't have an account? </span>
+            <div className="text-center pb-2">
+              <p className="text-gray-700 text-sm md:text-base">Don't have an account?</p>
               <button
                 onClick={handleToggle}
-                className="text-blue-500 font-semibold underline"
+                className="text-blue-600 hover:underline font-semibold"
               >
                 Create one!
               </button>
@@ -29,13 +28,13 @@ const Registration = () => {
         ) : (
           <>
             <Signup />
-            <div className="text-center mt-4">
-              <span>Already have an account? </span>
+            <div className="text-center pb-2">
+              <p className="text-gray-700 text-sm md:text-base">Already have an account?</p>
               <button
                 onClick={handleToggle}
-                className="text-blue-500 font-semibold underline"
+                className="text-blue-600 hover:underline font-semibold"
               >
-                Sign in
+                Sign In
               </button>
             </div>
           </>
