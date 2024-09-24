@@ -185,7 +185,7 @@ const Deposit = () => {
                   </p>
 
                   <label className="block text-gray-600 font-medium mb-2 font-sans" htmlFor="amount">
-                    Enter Amount (in USD)
+                    Enter Amount (In USD)
                   </label>
                   <input
                     id="amount"
