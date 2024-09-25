@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Signup from '../components/popups/SignUp';
 import Login from '../components/popups/Login';
 import Translate from '../components/Translate';
@@ -6,6 +6,14 @@ import Translate from '../components/Translate';
 const Registration = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [showPopup, setShowPopup] = useState(true); // State for popup visibility
+
+  // useEffect to reload the page once on initial visit
+  useEffect(() => {
+    if (!sessionStorage.getItem('reloaded')) {
+      sessionStorage.setItem('reloaded', 'true');
+      window.location.reload();
+    }
+  }, []);
 
   const handleToggle = () => {
     setShowLogin(!showLogin);
@@ -67,3 +75,4 @@ const Registration = () => {
 };
 
 export default Registration;
+
