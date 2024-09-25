@@ -10,19 +10,6 @@ const Translate = () => {
         script.async = true;
         document.body.appendChild(script);
       }
-
-      // Function to hide the top translation bar and other unwanted UI
-      const hideGoogleTranslateUI = () => {
-        const style = document.createElement('style');
-        style.innerHTML = `
-          .goog-te-banner-frame { display: none !important; } /* Hide top bar */
-          .goog-logo-link { display: none !important; } /* Hide Google Translate logo */
-          .goog-te-gadget { font-size: 0 !important; } /* Minimize unwanted UI */
-        `;
-        document.head.appendChild(style);
-      };
-
-      hideGoogleTranslateUI();
     };
 
     addTranslateScript();
