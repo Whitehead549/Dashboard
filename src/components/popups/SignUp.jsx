@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../Config/Config';
 import { collection, addDoc } from 'firebase/firestore';
 import LoaderSpinner from '../Essentials/LoaderSpinner'; // Import the LoaderSpinner component
+import { User, AtSign, Lock, Phone, MapPin, Eye, EyeOff } from 'lucide-react'; // Import lucide-react icons
 
 const Signup = () => {
   const navigate = useNavigate();
 
-  const [fullName, setFullName] = useState('');
+  // State management for the form fields
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [country, setCountry] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [loading, setLoading] = useState(false); // State for loading indicator
-  const [passwordVisible, setPasswordVisible] = useState(false); // State for password visibility
+  const [loading, setLoading] = useState(false);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false); // State for checkbox
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true before signup process starts
+    setLoading(true);
+
+    // Simple password confirmation check
+    if (password !== confirmPassword) {
+      setErrorMsg("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -26,15 +41,25 @@ const Signup = () => {
 
       // Adding user to Firestore
       await addDoc(collection(db, 'users'), {
-        fullName: fullName,
-        email: email,
+        firstName,
+        lastName,
+        username,
+        email,
+        phoneNumber,
+        country,
         uid: user.uid,
       });
 
       setSuccessMsg(`Signed up as ${user.email}`);
-      setFullName('');
+      // Clear form
+      setFirstName('');
+      setLastName('');
+      setUsername('');
       setEmail('');
       setPassword('');
+      setConfirmPassword('');
+      setPhoneNumber('');
+      setCountry('');
       setErrorMsg('');
 
       setTimeout(() => {
@@ -52,7 +77,7 @@ const Signup = () => {
         setErrorMsg(error.message);
       }
     } finally {
-      setLoading(false); // Set loading to false after signup process completes (success or failure)
+      setLoading(false);
     }
   };
 
@@ -61,79 +86,168 @@ const Signup = () => {
   };
 
   return (
-    <div className="bg-white px-6 py-4 sm:p-8 md:p-10 lg:p-6 max-w-md w-full mx-auto ">
-      {loading ? (
-        // Loader spinner centered on the page
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75">
-          <LoaderSpinner />
+    <div className="bg-white p-6 md:p-8 max-w-md w-full mx-auto mt-2">
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Sign Up</h1>
+      {successMsg && (
+        <div className="bg-green-50 border border-green-400 text-green-600 p-3 rounded mb-4">
+          {successMsg}
         </div>
-      ) : (
-        // Sign up form when not loading
-        <>
-          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-6 text-center">Sign Up</h1>
-          <hr className="mb-4" />
-          {successMsg && (
-            <div className="bg-green-50 border border-green-400 text-green-600 p-3 rounded mb-4">
-              {successMsg}
-            </div>
-          )}
-          <form className="space-y-6" autoComplete="off" onSubmit={handleSignup}>
-            <div>
-              <label htmlFor="fullName" className="block text-gray-700 mb-2">Username</label>
-              <input
-                id="fullName"
-                type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-                onChange={(e) => setFullName(e.target.value)}
-                value={fullName}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
-              <input
-                id="email"
-                type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={passwordVisible ? "text" : "password"}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                  onChange={(e) => setPassword(e.target.value)}
-                  value={password}
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-4 top-2 text-gray-600"
-                >
-                  {passwordVisible ? "🙈" : "👁️"}
-                </button>
-              </div>
-            </div>
-            <button
-              type="submit"
-              className={`w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={loading} // Disable button while loading
-            >
-              Sign Up
-            </button>
-          </form>
-          {errorMsg && (
-            <div className="bg-red-50 border border-red-400 text-red-600 p-3 rounded mt-4">
-              {errorMsg}
-            </div>
-          )}
-        </>
+      )}
+      <form className="space-y-6" onSubmit={handleSignup}>
+        {/* First Name */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <User className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="firstName"
+            type="text"
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="First Name"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+
+        {/* Last Name */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <User className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="lastName"
+            type="text"
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Last Name"
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+
+        {/* Username */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <User className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="username"
+            type="text"
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Username"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+
+        {/* Email */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <AtSign className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="email"
+            type="email"
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        {/* Password */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <Lock className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="password"
+            type={passwordVisible ? "text" : "password"}
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="text-gray-600 mx-2"
+          >
+            {passwordVisible ? <EyeOff /> : <Eye />}
+          </button>
+        </div>
+
+        {/* Confirm Password */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <Lock className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="confirmPassword"
+            type={passwordVisible ? "text" : "password"}
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Confirm Password"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+
+        {/* Phone Number */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <Phone className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="phoneNumber"
+            type="tel"
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Phone Number"
+            required
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+        </div>
+
+        {/* Country */}
+        <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500">
+          <MapPin className="w-5 h-5 text-gray-400 mx-2" />
+          <input
+            id="country"
+            type="text"
+            className="w-full px-4 py-2 border-0 focus:outline-none"
+            placeholder="Country"
+            required
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+          />
+        </div>
+
+        {/* Terms and Conditions */}
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            id="terms"
+            className="mr-2 mt-1"
+            checked={isTermsAccepted}
+            onChange={() => setIsTermsAccepted(!isTermsAccepted)}
+          />
+          <label htmlFor="terms" className="text-gray-700 text-sm">
+            I confirm that I act on my own behalf and have read and accepted the <span className="font-bold">selmabriggswilson </span> 
+            <a href="https://selmabriggswilson.com/termsandcondition/termsandcondition.html" target="_blank" className="text-blue-600 hover:underline">
+                     Terms and Conditions
+                </a>
+                &nbsp;&&nbsp;
+                <a href="https://selmabriggswilson.com/privacy/privacy.html" target="_blank" className="text-blue-600 hover:underline">
+                    Privacy Policy
+                </a>.
+          </label>
+        </div>
+
+        {/* Sign Up Button */}
+        <button
+          type="submit"
+          className={`w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-300 ${loading || !isTermsAccepted ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading || !isTermsAccepted}
+        >
+          {loading ? <LoaderSpinner /> : 'Sign Up'}
+        </button>
+      </form>
+
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-400 text-red-600 p-3 rounded mt-4">
+          {errorMsg}
+        </div>
       )}
     </div>
   );
