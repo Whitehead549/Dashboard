@@ -86,7 +86,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="bg-white p-6 md:p-8 max-w-md w-full mx-auto mt-2">
+    <div className="bg-white px-6 md:p-8 max-w-md w-full mx-auto mt-2">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Sign Up</h1>
       {successMsg && (
         <div className="bg-green-50 border border-green-400 text-green-600 p-3 rounded mb-4">
@@ -223,7 +223,7 @@ const Signup = () => {
             onChange={() => setIsTermsAccepted(!isTermsAccepted)}
           />
           <label htmlFor="terms" className="text-gray-700 text-sm">
-            I confirm that I act on my own behalf and have read and accepted the <span className="font-bold">selmabriggswilson </span> 
+           <span className="font-bold">I Agree To The </span> 
             <a href="https://selmabriggswilson.com/termsandcondition/termsandcondition.html" target="_blank" className="text-blue-600 hover:underline">
                      Terms and Conditions
                 </a>
