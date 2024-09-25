@@ -19,7 +19,7 @@ const Registration = () => {
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 p-4">
       <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full mx-2 relative z-10">
         {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-70">
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-95">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-xs w-full text-center">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Welcome!</h2>
               <p className="text-gray-600 mb-4">Is your default language English? Click below to proceed, or select another language first.</p>
