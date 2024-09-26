@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../Config/Config'; // Adjust the import based on your file structure
 import { collection, getDocs } from 'firebase/firestore';
 import { FaCopy } from 'react-icons/fa'; // Importing the copy icon from react-icons
+import cryptoImage from '../assets/forex.png'; // Importing the local image
+
 
 const Deposit = () => {
   const [wallets, setWallets] = useState([]);
@@ -149,11 +151,12 @@ const Deposit = () => {
           </div>
         )}
 
-        <div className="flex justify-center mb-8">
-          <iframe
-            src="https://lottie.host/embed/e1522f67-bcc6-4bd0-82ee-006ff594c65c/vSWZhyYART.json"
-            className="w-full max-w-md h-64"
-            title="Lottie Animation"
+          {/* Responsive Local Image */}
+          <div className="flex justify-center mt-6 mb-6">
+          <img
+            src={cryptoImage} // Local image reference
+            alt="Cryptocurrency representation"
+            className="h-auto w-full max-w-xs md:max-w-sm lg:max-w-lg" // Responsive classes
           />
         </div>
 
