@@ -1,176 +1,239 @@
-import React, { useState } from 'react';
-import { User, Mail, Building, Camera, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Camera, Lock, Phone, Globe, UserPlus, UserSquare } from 'lucide-react';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../Config/Config'; // Adjust the import path
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState({
-    username: 'nmaxwell',
-    name: 'Nelle Maxwell',
-    email: 'nmaxwell@mail.com',
-    company: 'Company Ltd.',
-    avatar: 'https://bootdey.com/img/Content/avatar/avatar1.png',
-  });
-
+  const [profile, setProfile] = useState({});
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+  const [error, setError] = useState('');
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const storage = getStorage();
 
-  // Handle profile changes
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const q = query(collection(db, 'users'), where('uid', '==', user.uid));
+        const data = await getDocs(q);
+        if (!data.empty) {
+          const userData = data.docs[0].data();
+          setProfile((prev) => ({ ...prev, ...userData }));
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle password changes
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswords((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Mock save functions
-  const handleSaveProfile = () => {
-    alert('Profile saved successfully');
-    // Save logic (e.g., API call)
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
-  const handleSavePassword = () => {
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      alert('New passwords do not match!');
+  const handleUploadPicture = async () => {
+    if (!file) {
+      setError('Please select an image file to upload.');
       return;
     }
-    alert('Password updated successfully');
-    // Save logic (e.g., API call)
+
+    setLoading(true);
+    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}`);
+    try {
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const userDocRef = query(collection(db, 'users'), where('uid', '==', auth.currentUser.uid));
+      const userDoc = await getDocs(userDocRef);
+      if (!userDoc.empty) {
+        await updateDoc(userDoc.docs[0].ref, { avatar: downloadURL });
+      }
+
+      setProfile((prev) => ({ ...prev, avatar: downloadURL }));
+      setAccountModalOpen(true); // Open modal on success
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const userDocRef = query(collection(db, 'users'), where('uid', '==', auth.currentUser.uid));
+      const userDoc = await getDocs(userDocRef);
+      if (!userDoc.empty) {
+        await updateDoc(userDoc.docs[0].ref, profile);
+        setAccountModalOpen(true); // Open modal on success
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleSavePassword = async () => {
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      setError('New passwords do not match!');
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        setError('No user is currently signed in.');
+        return;
+      }
+
+      const credential = EmailAuthProvider.credential(user.email, passwords.currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, passwords.newPassword);
+      setPasswordModalOpen(true); // Open modal on success
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
     <div className="container mx-auto p-4 md:p-6">
       {/* Account Settings Section */}
-      <div className="bg-white p-4 md:p-6 rounded-md shadow-md w-full">
-        <h2 className="text-2xl font-bold mb-4">Account Settings</h2>
+      <div className="bg-white p-6 rounded-lg shadow-md w-full">
+        <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
         <div className="flex flex-col md:flex-row items-center mb-6">
           <img
-            src={profile.avatar}
+            src={profile.avatar || 'https://via.placeholder.com/150'} // Placeholder for default avatar
             alt="Profile Avatar"
-            className="w-20 h-20 rounded-full"
+            className="w-24 h-24 rounded-full border border-gray-300"
           />
           <div className="mt-4 md:mt-0 md:ml-4">
-            <label className="cursor-pointer flex items-center bg-blue-500 text-white px-4 py-2 rounded-md">
+            <label className="cursor-pointer flex items-center bg-gray-500 text-white px-2 py-2 rounded-md hover:bg-blue-700 transition mb-2">
               <Camera className="mr-2" />
-              Upload new photo
-              <input type="file" className="hidden" />
+              Select Photo
+              <input type="file" className="hidden" onChange={handleFileChange} />
             </label>
+            <button
+              className={`bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 ${
+                loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 transition'
+              }`}
+              onClick={handleUploadPicture}
+              disabled={loading}
+            >
+              {loading ? 'Uploading...' : 'Upload'}
+            </button>
           </div>
         </div>
         <div className="space-y-4">
-          <div className="flex items-center">
-            <User className="mr-2" />
-            <input
-              type="text"
-              name="username"
-              value={profile.username}
-              onChange={handleProfileChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="Username"
-            />
-          </div>
-          <div className="flex items-center">
-            <User className="mr-2" />
-            <input
-              type="text"
-              name="name"
-              value={profile.name}
-              onChange={handleProfileChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="Name"
-            />
-          </div>
-          <div className="flex items-center">
-            <Mail className="mr-2" />
-            <input
-              type="email"
-              name="email"
-              value={profile.email}
-              onChange={handleProfileChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="Email"
-            />
-          </div>
-          <div className="flex items-center">
-            <Building className="mr-2" />
-            <input
-              type="text"
-              name="company"
-              value={profile.company}
-              onChange={handleProfileChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="Company"
-            />
-          </div>
+          {['username', 'firstName', 'lastName', 'email', 'phoneNumber', 'country'].map((field, index) => (
+            <div className="flex items-center" key={index}>
+              {field === 'email' ? <Mail className="mr-2" /> : 
+              field === 'username' ? <UserPlus className="mr-2" /> : 
+              field === 'lastName' ? <UserSquare className="mr-2" /> : 
+              field === 'phoneNumber' ? <Phone className="mr-2" /> : 
+              field === 'country' ? <Globe className="mr-2" /> : 
+              <User className="mr-2" />}
+
+              <input
+                type={field === 'email' ? 'email' : 'text'}
+                name={field}
+                value={profile[field] || ''}
+                onChange={handleProfileChange}
+                className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300"
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+              />
+            </div>
+          ))}
         </div>
         <div className="mt-6 flex justify-end space-x-4">
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-blue-700 transition"
             onClick={handleSaveProfile}
           >
             Save Changes
           </button>
-          <button className="bg-gray-500 text-white px-4 py-2 rounded-md w-full md:w-auto">
+          <button className="bg-gray-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-gray-700 transition">
             Cancel
           </button>
         </div>
       </div>
 
       {/* Password Change Section */}
-      <div className="bg-white p-4 md:p-6 rounded-md shadow-md mt-8 w-full">
-        <h2 className="text-2xl font-bold mb-4">Change Password</h2>
+      <div className="bg-white p-6 rounded-lg shadow-md mt-8 w-full">
+        <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
-          <div className="flex items-center">
-            <Lock className="mr-2" />
-            <input
-              type="password"
-              name="currentPassword"
-              value={passwords.currentPassword}
-              onChange={handlePasswordChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="Current Password"
-            />
-          </div>
-          <div className="flex items-center">
-            <Lock className="mr-2" />
-            <input
-              type="password"
-              name="newPassword"
-              value={passwords.newPassword}
-              onChange={handlePasswordChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="New Password"
-            />
-          </div>
-          <div className="flex items-center">
-            <Lock className="mr-2" />
-            <input
-              type="password"
-              name="confirmPassword"
-              value={passwords.confirmPassword}
-              onChange={handlePasswordChange}
-              className="border px-4 py-2 rounded-md w-full"
-              placeholder="Confirm New Password"
-            />
-          </div>
+          {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
+            <div className="flex items-center" key={index}>
+              <Lock className="mr-2" />
+              <input
+                type="password"
+                name={field}
+                value={passwords[field]}
+                onChange={handlePasswordChange}
+                className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300"
+                placeholder={field.replace(/([A-Z])/g, ' $1').replace(/Password/, ' Password')}
+              />
+            </div>
+          ))}
+          {error && <p className="text-red-500 text-center">{error}</p>}
         </div>
         <div className="mt-6 flex justify-end space-x-4">
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md w-full md:w-auto"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-blue-700 transition"
             onClick={handleSavePassword}
           >
             Update Password
           </button>
-          <button className="bg-gray-500 text-white px-4 py-2 rounded-md w-full md:w-auto">
+          <button className="bg-gray-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-gray-700 transition">
             Cancel
           </button>
         </div>
       </div>
+
+      {/* Account Settings Modal */}
+      {accountModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Account Settings Updated</h2>
+            <p className="text-gray-600 mb-4">Your account settings have been successfully changed.</p>
+            <button
+              onClick={() => setAccountModalOpen(false)}
+              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Password Change Modal */}
+      {passwordModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Password Updated</h2>
+            <p className="text-gray-600 mb-4">Your password has been successfully changed.</p>
+            <button
+              onClick={() => setPasswordModalOpen(false)}
+              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
