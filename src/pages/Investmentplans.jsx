@@ -86,7 +86,7 @@ const InvestmentPlans = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start w-full p-6 gap-6 overflow-auto">
+    <div className="flex flex-col items-center justify-start p-6 gap-6 w-full max-w-4xl mx-auto min-h-screen pb-20"> {/* Added min-h-screen and pb-20 */}
       {/* Total Deposits Card */}
       <StatCard 
         name="Total Deposits" 
@@ -142,4 +142,3 @@ const InvestmentPlans = () => {
 };
 
 export default InvestmentPlans;
-
