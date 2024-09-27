@@ -58,7 +58,7 @@ const SubscriptionPlanCard = ({ title, price, min, max, duration, roi, amount, o
         type="number" 
         value={amount} 
         onChange={onAmountChange}
-        className="w-full p-2 border border-gray-300 rounded-xl mb-4"  // Changed to "rounded-lg" for roundness
+        className="w-full p-2 border border-gray-300 rounded-xl mb-4"
         placeholder="$0" 
       />
 
@@ -86,7 +86,7 @@ const InvestmentPlans = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start p-6 gap-6 w-full max-w-4xl mx-auto">
+    <div className="min-h-screen w-full flex flex-col items-center justify-start p-6 gap-6 overflow-y-auto">
       {/* Total Deposits Card */}
       <StatCard 
         name="Total Deposits" 
@@ -142,4 +142,3 @@ const InvestmentPlans = () => {
 };
 
 export default InvestmentPlans;
-
