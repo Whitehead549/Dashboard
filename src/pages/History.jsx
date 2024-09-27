@@ -47,7 +47,7 @@ const History = () => {
         setUserId(user.uid);
         checkDate(); // Check for existing date in Firestore
       } else {
-        navigate('/login'); // Redirect to login if user is not authenticated
+        navigate('/Dashboard'); // Redirect to login if user is not authenticated
       }
     });
 
