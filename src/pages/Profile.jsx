@@ -110,9 +110,9 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6">
+    <div className="min-h-screen container mx-auto p-4 md:p-6 overflow-y-auto">
       {/* Account Settings Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md w-full">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full mb-8">
         <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
         <div className="flex flex-col md:flex-row items-center mb-6">
           <img
@@ -172,7 +172,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Password Change Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md mt-8 w-full">
+      <div className="bg-white p-6 rounded-lg shadow-md mb-8 w-full">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
           {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
@@ -205,13 +205,12 @@ const ProfilePage = () => {
 
       {/* Account Settings Modal */}
       {accountModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Account Settings Updated</h2>
-            <p className="text-gray-600 mb-4">Your account settings have been successfully changed.</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p>Account settings updated successfully!</p>
             <button
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
               onClick={() => setAccountModalOpen(false)}
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Close
             </button>
@@ -221,13 +220,12 @@ const ProfilePage = () => {
 
       {/* Password Change Modal */}
       {passwordModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full text-center">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Password Updated</h2>
-            <p className="text-gray-600 mb-4">Your password has been successfully changed.</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p>Password updated successfully!</p>
             <button
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
               onClick={() => setPasswordModalOpen(false)}
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Close
             </button>
