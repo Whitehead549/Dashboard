@@ -86,6 +86,8 @@ const InvestmentPlans = () => {
   };
 
   return (
+    <>
+    <h1 className="text-2xl font-bold">Investment Plans</h1>
     <div className="flex flex-col items-center justify-start p-6 gap-6 w-full max-w-4xl mx-auto min-h-screen pb-20"> {/* Added min-h-screen and pb-20 */}
       {/* Total Deposits Card */}
       <StatCard 
@@ -138,6 +140,7 @@ const InvestmentPlans = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 

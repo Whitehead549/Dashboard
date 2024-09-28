@@ -110,9 +110,9 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen container mx-auto p-4 md:p-6 overflow-y-auto">
+    <div className="h-full flex flex-col container mx-auto p-4 md:p-6 overflow-y-auto">
       {/* Account Settings Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md w-full mb-8">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full mb-8 flex-grow">
         <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
         <div className="flex flex-col md:flex-row items-center mb-6">
           <img
@@ -206,10 +206,10 @@ const ProfilePage = () => {
       {/* Account Settings Modal */}
       {accountModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <p>Account settings updated successfully!</p>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-xl font-semibold mb-4">Profile Updated Successfully!</h3>
             <button
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md w-full hover:bg-blue-700 transition"
               onClick={() => setAccountModalOpen(false)}
             >
               Close
@@ -218,13 +218,13 @@ const ProfilePage = () => {
         </div>
       )}
 
-      {/* Password Change Modal */}
+      {/* Password Modal */}
       {passwordModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <p>Password updated successfully!</p>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <h3 className="text-xl font-semibold mb-4">Password Updated Successfully!</h3>
             <button
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md w-full hover:bg-blue-700 transition"
               onClick={() => setPasswordModalOpen(false)}
             >
               Close
@@ -237,3 +237,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
