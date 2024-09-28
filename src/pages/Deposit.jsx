@@ -4,6 +4,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { FaCopy } from 'react-icons/fa'; // Importing the copy icon from react-icons
 import UploadPage from '../components/Essentials/UploadPage';
 
+
 const Deposit = () => {
   const [wallets, setWallets] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState(null);
@@ -110,13 +111,13 @@ const Deposit = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center items-center text-gray-600">Loading wallets...</div>;
-  if (error) return <div className="flex justify-center items-center text-red-600">{error}</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen text-gray-600">Loading wallets...</div>;
+  if (error) return <div className="flex justify-center items-center h-screen text-red-600">{error}</div>;
 
   return (
     <>
       <h1 className="text-3xl md:text-3xl font-bold text-gray-800 mb-8 font-sans">Deposit</h1>
-      <div className="container mx-auto px-4 md:px-8 lg:px-12 py-4 flex flex-col items-center sm:mr-4">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 py-6 flex flex-col items-center sm:mr-4">
 
         {/* Custom Alert Modal for Minimum Deposit Validation */}
         {showAlert && (
@@ -150,25 +151,24 @@ const Deposit = () => {
           </div>
         )}
 
-        {/* Amount and status section */}
-        {proceed && (
-          <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105 mb-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Transaction Details</h2>
-            <div className="flex justify-between mb-4">
-              {/* Amount Section */}
-              <div className="flex flex-col">
-                <h3 className="text-lg font-semibold text-gray-700">Amount</h3>
-                <p className="text-lg text-green-600">${amount}</p>
-              </div>
-
-              {/* Status Section */}
-              <div className="flex flex-col">
-                <h3 className="text-lg font-semibold text-gray-700">Status</h3>
-                <p className="text-lg text-yellow-600">Pending</p>
-              </div>
-            </div>
+          {/* Amount and status section */}
+      <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105 mb-6">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Transaction Details</h2>
+        <div className="flex justify-between mb-4">
+          {/* Amount Section */}
+          <div className="flex flex-col">
+            <h3 className="text-lg font-semibold text-gray-700">Amount</h3>
+            <p className="text-lg  text-green-600">${amount}</p>
           </div>
-        )}
+
+          {/* Status Section */}
+          <div className="flex flex-col">
+            <h3 className="text-lg font-semibold text-gray-700">Status</h3>
+            <p className="text-lg  text-yellow-600">Pending</p>
+          </div>
+        </div>
+      </div>
+          
 
         <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105">
           {!proceed ? (
@@ -226,41 +226,39 @@ const Deposit = () => {
             </>
           ) : (
             <div className="text-center">
-              <h2 className="text-xl font-semibold mb-2 text-gray-800 font-sans">Transaction Summary</h2>
-              <div className="mb-1">
-                <span className="font-medium text-gray-700">Selected Wallet Type:</span>
-                <div className="text-base font-semibold text-blue-600">{selectedWallet.walletType}</div>
-              </div>
-              <div className="mb-1">
-                <span className="font-medium text-gray-700">Amount:</span>
-                <div className="text-base font-semibold text-blue-600">${amount}</div>
-              </div>
-              <h2 className="text-xl font-semibold mb-2 text-gray-800 font-sans">Wallet Address</h2>
-              <div className="flex items-center justify-center gap-1">
-                <div className="text-sm font-mono p-1 bg-gray-100 rounded-lg border border-gray-300 mb-1 sm:mb-0">
-                  {walletAddress}
-                </div>
-                <button onClick={copyToClipboard} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                  <FaCopy size={20} />
-                </button>
-              </div>
-              <div className="text-sm text-gray-600 mt-2">{getInstructionNote(selectedWallet.walletType)}</div>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 font-sans">Transaction Summary</h2>
+            <div className="mb-1">
+              <span className="font-medium text-gray-700">Selected Wallet Type:</span>
+              <div className="text-base font-semibold text-blue-600">{selectedWallet.walletType}</div>
             </div>
+            <div className="mb-1">
+              <span className="font-medium text-gray-700">Amount:</span>
+              <div className="text-base font-semibold text-blue-600">${amount}</div>
+            </div>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 font-sans">Wallet Address</h2>
+            <div className="flex items-center justify-center gap-1">
+              <div className="text-sm font-mono p-1 bg-gray-100 rounded-lg border border-gray-300 mb-1 sm:mb-0">
+                {walletAddress}
+              </div>
+              <button onClick={copyToClipboard} className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                <FaCopy size={20} />
+              </button>
+            </div>
+            <div className="text-sm text-gray-600 mt-2">{getInstructionNote(selectedWallet.walletType)}</div>
+          </div>
+          
           )}
         </div>
+      
+        <UploadPage/>
+        
+   
+      <div className='my-4'>
 
-        <UploadPage />
-
-        <div className="flex justify-center mt-6">
-          <img
-            src="https://www.freepngimg.com/thumb/bitcoin/63394-cryptocurrency-money-ethereum-bitcoin-download-hd-png.png"
-            alt="Cryptocurrency representation"
-            className="h-auto w-full max-w-xs md:max-w-sm lg:max-w-lg"
-          />
-        </div>
+      </div>
       </div>
     </>
   );
-};
+}
 
 export default Deposit;

@@ -13,7 +13,7 @@ const Withdraws = () => {
   return (
     <>
       <h1 className="text-2xl font-bold">Withdraws</h1>
-      <div className="flex flex-col items-center justify-start min-h-screen"> {/* Changed h-screen to min-h-screen */}
+      <div className="flex flex-col items-center justify-center h-screen">
         {/* Card for Account Balance */}
         <div className="bg-white shadow-lg rounded-lg p-6 mb-8 w-full max-w-md">
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Account Balance</h2>
@@ -70,10 +70,12 @@ const Withdraws = () => {
           </button>
         </div>
       </div>
+      <div className="my-4">
+
+      </div>
     </>
   );
 };
 
 export default Withdraws;
-
 
