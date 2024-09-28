@@ -8,7 +8,6 @@ import Deposit from './pages/Deposit';
 import Investmentplans from './pages/Investmentplans';
 import Withdraws from './pages/Withdraws';
 import History from './pages/History';
-import ContactUs from './pages/ContactUs';
 import Registration from './pages/Registration';
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
           <Route path="Investmentplans" element={<Investmentplans />} />
           <Route path="Withdraws" element={<Withdraws />} />
           <Route path="History" element={<History/>} />
-          <Route path="ContactUs" element={<ContactUs />} />
+         
 
         </Route>
       </Routes>

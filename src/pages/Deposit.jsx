@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../Config/Config'; // Adjust the import based on your file structure
 import { collection, getDocs } from 'firebase/firestore';
 import { FaCopy } from 'react-icons/fa'; // Importing the copy icon from react-icons
-import cryptoImage from '../assets/forex.png'; // Importing the local image
+import UploadPage from '../components/Essentials/UploadPage';
 
 
 const Deposit = () => {
@@ -151,14 +151,24 @@ const Deposit = () => {
           </div>
         )}
 
-          {/* Responsive Local Image */}
-          <div className="flex justify-center mt-6 mb-6">
-          <img
-            src={cryptoImage} // Local image reference
-            alt="Cryptocurrency representation"
-            className="h-auto w-full max-w-xs md:max-w-sm lg:max-w-lg" // Responsive classes
-          />
+          {/* Amount and status section */}
+      <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105 mb-6">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Transaction Details</h2>
+        <div className="flex justify-between mb-4">
+          {/* Amount Section */}
+          <div className="flex flex-col">
+            <h3 className="text-lg font-semibold text-gray-700">Amount</h3>
+            <p className="text-lg  text-green-600">${amount}</p>
+          </div>
+
+          {/* Status Section */}
+          <div className="flex flex-col">
+            <h3 className="text-lg font-semibold text-gray-700">Status</h3>
+            <p className="text-lg  text-yellow-600">Pending</p>
+          </div>
         </div>
+      </div>
+          
 
         <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105">
           {!proceed ? (
@@ -239,8 +249,12 @@ const Deposit = () => {
           
           )}
         </div>
-
+      
+        <UploadPage/>
+        
+   
         <div className="flex justify-center mt-6">
+         
           <img
             src="https://www.freepngimg.com/thumb/bitcoin/63394-cryptocurrency-money-ethereum-bitcoin-download-hd-png.png"
             alt="Cryptocurrency representation"

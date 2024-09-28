@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { DollarSign } from 'lucide-react';
-import { FaCheck, FaArrowDown, FaArrowUp, FaClock, FaChartLine } from 'react-icons/fa';
+import { FaArrowDown, FaArrowUp, FaClock, FaChartLine } from 'react-icons/fa';
 
 // StatCard component for the Total Deposits card
 const StatCard = ({ name, icon: Icon, value, color, textColor = '' }) => {
@@ -64,7 +64,7 @@ const SubscriptionPlanCard = ({ title, price, min, max, duration, roi, amount, o
 
       <div className='text-center'>
         <button 
-          className='bg-blue-600 text-white py-3 px-8 rounded-3xl text-center font-medium hover:bg-blue-700 transition'
+          className='bg-blue-700 text-white py-3 px-8 rounded-3xl text-center font-medium hover:bg-blue-800 transition'
           onClick={onInvest}
         >
           Invest
@@ -78,7 +78,7 @@ const InvestmentPlans = () => {
   const [amount, setAmount] = useState({
     beginner: 0,
     advanced: 0,
-    professional: 0,
+    premium: 0,
   });
 
   const handleInputChange = (e, plan) => {
@@ -124,17 +124,17 @@ const InvestmentPlans = () => {
           onInvest={() => alert(`Investing $${amount.advanced} in ADVANCED PLAN`)}
         />
 
-        {/* Plan 3: PROFESSIONAL */}
+        {/* Plan 3: PREMIUM */}
         <SubscriptionPlanCard 
-          title="PROFESSIONAL PLAN"
+          title="PREMIUM PLAN"
           price="10000"
           min="10000"
           max="99999"
           duration="20 DAYS"
           roi="40%"
-          amount={amount.professional}
-          onAmountChange={(e) => handleInputChange(e, 'professional')}
-          onInvest={() => alert(`Investing $${amount.professional} in PROFESSIONAL PLAN`)}
+          amount={amount.premium}
+          onAmountChange={(e) => handleInputChange(e, 'premium')}
+          onInvest={() => alert(`Investing $${amount.premium} in PREMIUM PLAN`)}
         />
       </div>
     </div>
