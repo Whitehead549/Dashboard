@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Withdraws = () => {
   const [walletType, setWalletType] = useState("");
@@ -10,18 +10,23 @@ const Withdraws = () => {
     console.log("Proceed with withdrawal:", { walletType, walletAddress, amount });
   };
 
+  // Scroll to the top of the page when the component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
-      <h1 className="text-2xl font-bold">Withdraws</h1>
-      <div className="flex flex-col items-center justify-center h-screen">
+      <h1 className="text-2xl font-bold mb-4">Withdraws</h1>
+      <div className="flex flex-col items-center justify-center">
         {/* Card for Account Balance */}
-        <div className="bg-white shadow-lg rounded-lg p-6 mb-8 w-full max-w-md">
+        <div className="bg-white shadow-lg rounded-lg p-6 mb-4 w-full max-w-md"> {/* Reduced mb-8 to mb-4 */}
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Account Balance</h2>
           <p className="text-2xl font-bold text-gray-900">$2000</p> {/* Example balance */}
         </div>
 
         {/* Form Inputs */}
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md mb-8 sm:my-8 lg:my-8">
           {/* Wallet Type */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Wallet Type</label>
@@ -70,12 +75,9 @@ const Withdraws = () => {
           </button>
         </div>
       </div>
-      <div className="my-4">
 
-      </div>
     </>
   );
 };
 
 export default Withdraws;
-

@@ -110,7 +110,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="flex flex-col container mx-auto p-4 md:p-6 min-h-screen overflow-y-auto">
+    <div className="flex flex-col container mx-auto p-4 md:p-6 min-h-screen overflow-y-auto mb-8 sm:mb-8 lg:mb-8">
       {/* Account Settings Section */}
       <div className="bg-white p-6 rounded-lg shadow-md w-full mb-4 flex-grow">
         <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
