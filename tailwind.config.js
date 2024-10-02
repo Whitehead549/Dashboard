@@ -7,6 +7,9 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
+        colors: {
+          primary: '#1D4ED8', // Define your primary color here
+        },
       },
     },
   },

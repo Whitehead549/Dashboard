@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from "react";
 import { motion } from 'framer-motion';
 import { DollarSign } from 'lucide-react';
 import { FaArrowDown, FaArrowUp, FaClock, FaChartLine } from 'react-icons/fa';
+import { db, auth } from '../Config/Config'; // Adjust based on your file structure
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 // StatCard component for the Total Deposits card
 const StatCard = ({ name, icon: Icon, value, color, textColor = '' }) => {
@@ -50,7 +53,8 @@ const SubscriptionPlanCard = ({ title, price, min, max, duration, roi, amount, o
         </li>
         <li className="flex items-start">
           <FaChartLine className="text-blue-600 mr-2 mt-1" size={20} />
-          <span className="text-gray-800">ROI: {roi}</span>
+          {/* Display ROI as percentage */}
+          <span className="text-gray-800">ROI: {roi * 100}%</span>
         </li>
       </ul>
       <label className="block mb-2">Enter Amount (In USD)</label>
@@ -81,65 +85,187 @@ const InvestmentPlans = () => {
     premium: 0,
   });
 
+  const [totalAmount, setTotalAmount] = useState(0); 
+
+   // Step 1: Move the fetching logic directly into useEffect
+  useEffect(() => {
+    const fetchTotalAmount = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please log in.');
+        return;
+      }
+
+      const depositsQuery = query(
+        collection(db, 'deposits'),
+        where('uid', '==', user.uid)
+      );
+
+      const depositsSnapshot = await getDocs(depositsQuery);
+      depositsSnapshot.forEach((docSnapshot) => {
+        const depositData = docSnapshot.data();
+        setTotalAmount(depositData.TotalAmount);  // Set TotalAmount in state
+      });
+    };
+
+    // Call the fetch function when the component mounts
+    fetchTotalAmount();
+  }, []); 
+
   const handleInputChange = (e, plan) => {
     setAmount({ ...amount, [plan]: e.target.value });
   };
 
+  const handleInvest = async (plan, roi, titleplan) => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Please log in to invest.');
+      return;
+    }
+
+    const investmentAmount = parseFloat(amount[plan]);
+    const TotalEarnings = investmentAmount * roi;  // Use original ROI value for calculation
+    const AccountBalance = investmentAmount + TotalEarnings;
+       
+    try {
+      // 1. Subtract investmentAmount from the TotalAmount in the deposits collection
+      const depositsQuery = query(
+        collection(db, 'deposits'),
+        where('uid', '==', user.uid)
+      );
+      const depositsSnapshot = await getDocs(depositsQuery);
+
+      depositsSnapshot.forEach(async (docSnapshot) => {
+        const depositData = docSnapshot.data();
+        const newTotalAmount = depositData.TotalAmount - investmentAmount;
+
+        if (newTotalAmount >= 0) {
+          // Update the TotalAmount after subtracting the investment
+          await updateDoc(doc(db, 'deposits', docSnapshot.id), {
+            TotalAmount: newTotalAmount,
+          });
+          setTotalAmount(newTotalAmount);
+        } else {
+          alert('Not enough funds to make this investment.');
+          return;
+        }
+      });
+
+      // 2. Update or create the AccountBalance collection
+      const accountBalanceDoc = doc(db, 'AccountBalance', user.uid);
+      const accountBalanceSnapshot = await getDoc(accountBalanceDoc);
+
+      if (accountBalanceSnapshot.exists()) {
+        // Update the existing document
+        await updateDoc(accountBalanceDoc, {
+          AccountBalance: accountBalanceSnapshot.data().AccountBalance + AccountBalance,
+          TotalEarnings: accountBalanceSnapshot.data().TotalEarnings + TotalEarnings,
+          investmentAmount: accountBalanceSnapshot.data().investmentAmount + investmentAmount,
+          titleplan,  // Include the title of the subscribed plan
+        });
+      } else {
+        // Create a new document if it doesn't exist
+        await setDoc(accountBalanceDoc, {
+          uid: user.uid,
+          AccountBalance,
+          TotalEarnings,
+          investmentAmount,
+          titleplan,  // Include the title of the subscribed plan
+        });
+      }
+
+      // 3. Create or update a document in the history collection
+      const usersQuery = query(
+        collection(db, 'users'),
+        where('uid', '==', user.uid)
+      );
+      const usersSnapshot = await getDocs(usersQuery);
+
+      if (!usersSnapshot.empty) {
+        const userData = usersSnapshot.docs[0].data();
+        const { firstName, lastName } = userData;
+
+        const presentDate = new Date();
+        const durationDays = parseInt(plan === 'beginner' ? 10 : plan === 'advanced' ? 15 : 20); // Set duration based on plan
+        const futureDate = new Date(presentDate);
+        futureDate.setDate(futureDate.getDate() + durationDays);
+
+        const historyDoc = doc(db, 'history', user.uid);
+        await setDoc(historyDoc, {
+          futureDate: futureDate.toISOString(),
+          status: false,
+          firstName,
+          lastName,
+          uid: user.uid,
+        }, { merge: true }); // Use merge to update if exists
+
+        alert(`Successfully invested $${investmentAmount} in the ${plan.toUpperCase()} plan!`);
+      } else {
+        alert('User data not found in the database.');
+      }
+    } catch (error) {
+      console.error('Error updating account balance: ', error);
+      alert('Failed to invest. Please try again later.');
+    }
+  };
+
+ 
+
   return (
     <>
-    <h1 className="text-2xl font-bold">Investment Plans</h1>
-    <div className="flex flex-col items-center justify-start p-6 gap-6 w-full max-w-4xl mx-auto min-h-screen pb-20"> {/* Added min-h-screen and pb-20 */}
-      {/* Total Deposits Card */}
-      <StatCard 
-        name="Total Deposits" 
-        icon={DollarSign} 
-        value="$0" 
-        color="green" 
-        textColor="text-green-900"
-      />
-
-      {/* Plans Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
-        {/* Plan 1: BEGINNER */}
-        <SubscriptionPlanCard 
-          title="BEGINNER PLAN"
-          price="100"
-          min="100"
-          max="999"
-          duration="10 DAYS"
-          roi="30%"
-          amount={amount.beginner}
-          onAmountChange={(e) => handleInputChange(e, 'beginner')}
-          onInvest={() => alert(`Investing $${amount.beginner} in BEGINNER PLAN`)}
+      <h1 className="text-2xl font-bold">Investment Plans</h1>
+      <div className="flex flex-col items-center justify-start p-6 gap-6 w-full max-w-4xl mx-auto min-h-screen pb-20">
+        {/* Total Deposits Card */}
+        <StatCard 
+          name="Total Deposits" 
+          icon={DollarSign} 
+          value={totalAmount} 
+          color="green" 
+          textColor="text-green-900"
         />
 
-        {/* Plan 2: ADVANCED */}
-        <SubscriptionPlanCard 
-          title="ADVANCED PLAN"
-          price="1000"
-          min="1000"
-          max="9999"
-          duration="15 DAYS"
-          roi="35%"
-          amount={amount.advanced}
-          onAmountChange={(e) => handleInputChange(e, 'advanced')}
-          onInvest={() => alert(`Investing $${amount.advanced} in ADVANCED PLAN`)}
-        />
+        {/* Plans Container */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+          {/* Plan 1: BEGINNER */}
+          <SubscriptionPlanCard 
+            title="BEGINNER PLAN"
+            price="100"
+            min="100"
+            max="999"
+            duration="10 DAYS"
+            roi={1}  // ROI used in calculations
+            amount={amount.beginner}
+            onAmountChange={(e) => handleInputChange(e, 'beginner')}
+            onInvest={() => handleInvest('beginner', 1, 'BEGINNER PLAN')}
+          />
 
-        {/* Plan 3: PREMIUM */}
-        <SubscriptionPlanCard 
-          title="PREMIUM PLAN"
-          price="10000"
-          min="10000"
-          max="99999"
-          duration="20 DAYS"
-          roi="40%"
-          amount={amount.premium}
-          onAmountChange={(e) => handleInputChange(e, 'premium')}
-          onInvest={() => alert(`Investing $${amount.premium} in PREMIUM PLAN`)}
-        />
+          {/* Plan 2: ADVANCED */}
+          <SubscriptionPlanCard 
+            title="ADVANCED PLAN"
+            price="1000"
+            min="1000"
+            max="9999"
+            duration="15 DAYS"
+            roi={3}  // ROI used in calculations
+            amount={amount.advanced}
+            onAmountChange={(e) => handleInputChange(e, 'advanced')}
+            onInvest={() => handleInvest('advanced', 3, 'ADVANCED PLAN')}
+          />
+
+          {/* Plan 3: PROFESSIONAL */}
+          <SubscriptionPlanCard 
+            title="PROFESSIONAL PLAN"
+            price="10000"
+            min="10000"
+            max="100000"
+            duration="20 DAYS"
+            roi={5}  // ROI used in calculations
+            amount={amount.premium}
+            onAmountChange={(e) => handleInputChange(e, 'premium')}
+            onInvest={() => handleInvest('premium', 5, 'PROFESSIONAL PLAN')}
+          />
+        </div>
       </div>
-    </div>
     </>
   );
 };

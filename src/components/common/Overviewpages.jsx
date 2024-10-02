@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { DollarSign, CreditCard, ArrowUpCircle, ArrowDownCircle, Users, Gift } from "lucide-react";
+import { DollarSign, CreditCard, ArrowUpCircle, ArrowDownCircle, Users, Gift, Timer } from "lucide-react";
 import StatCard from "./Statcard";
 
-const OverviewPage = () => {
+const OverviewPage = ({countdown, AccountBalance, TotalEarnings, TotalDeposits, TotalWithdrawals, Plan}) => {
 	return (
 		<main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
 			{/* Responsive Grid Layout */}
@@ -16,7 +16,7 @@ const OverviewPage = () => {
 				<StatCard 
 					name='Account Balance' 
 					icon={DollarSign} 
-					value='$5,678.90' 
+					value={`$${AccountBalance}`}
 					color='#6366F1' 
 					textColor='text-white' 
 				/>
@@ -25,7 +25,7 @@ const OverviewPage = () => {
 				<StatCard 
 					name='Total Earnings' 
 					icon={CreditCard} 
-					value='$45,678.90' 
+					value={`$${TotalEarnings}`}
 					color='#8B5CF6' 
 					textColor='text-white' 
 				/>
@@ -34,7 +34,7 @@ const OverviewPage = () => {
 				<StatCard 
 					name='Total Withdrawals' 
 					icon={ArrowUpCircle} 
-					value='$10,234.00' 
+					value= {`$${TotalWithdrawals}`}
 					color='#EC4899' 
 					textColor='text-white' 
 				/>
@@ -43,25 +43,34 @@ const OverviewPage = () => {
 				<StatCard 
 					name='Total Deposits' 
 					icon={ArrowDownCircle} 
-					value='$12,345.00' 
+					value={`$${TotalDeposits}`}
 					color='#10B981' 
 					textColor='text-white' 
 				/>
 
-				{/* 5. Total Referrals */}
+				{/* 5. Duration */}
 				<StatCard 
-					name='Total Referrals' 
-					icon={Users} 
-					value='150' 
-					color='#F59E0B' 
-					textColor='text-white' 
-				/>
+				name='Duration' 
+				icon={Timer} 
+				value={
+					<span className="text-2xl sm:text-2xl md:text-2xl lg:text-2xl xl:text-2xl">
+						{countdown}
+					</span>
+				}
+				color='#F59E0B' 
+				textColor='text-white' 
+			/>
 
-				{/* 6. Referral Earnings */}
+
+				{/* 6. Plans */}
 				<StatCard 
-					name='Referral Earnings' 
-					icon={Gift} 
-					value='$1,234.56' 
+					name='Plan' 
+					icon={Gift}
+					value={
+						<span className="text-2xl sm:text-2xl md:text-2xl lg:text-2xl xl:text-2xl">
+							{Plan}
+						</span>
+					}
 					color='#3B82F6' 
 					textColor='text-white' 
 				/>

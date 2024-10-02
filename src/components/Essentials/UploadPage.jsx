@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../../Config/Config'; // Ensure Firebase is correctly initialized
 
-const UploadPage = () => {
+const UploadPage = ({ amount }) => {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
   const [dragActive, setDragActive] = useState(false);
@@ -37,26 +40,82 @@ const UploadPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Ensure the user is authenticated
+    const user = auth.currentUser;
+    if (!user) {
+      setUploadStatus('User not authenticated.');
+      return;
+    }
+
     if (file) {
-      // Simulate upload process
-      setUploadStatus('Uploading...');
-      // Here you would typically handle the file upload logic
-      setTimeout(() => {
-        setUploadStatus('Upload successful!'); // Mocking a successful upload
+      try {
+        // Start upload process
+        setUploadStatus('Uploading...');
+        const storageRef = ref(getStorage(), `proofs/${user.uid}/${file.name}`);
+
+        // Upload the file to Firebase Storage
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        // Fetch user's firstName and lastName from the 'users' collection
+        const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
+        const userSnapshot = await getDocs(userQuery);
+
+        if (userSnapshot.empty) {
+          setUploadStatus('User details not found.');
+          return;
+        }
+
+        // Assuming user details are stored in the first document found
+        const userData = userSnapshot.docs[0].data();
+        const { firstName, lastName } = userData;
+
+        // Check if a deposit already exists for the user
+        const depositQuery = query(collection(db, 'deposits'), where('uid', '==', user.uid));
+        const depositSnapshot = await getDocs(depositQuery);
+
+        if (!depositSnapshot.empty) {
+          // If deposit exists, update it with the new data
+          const depositDoc = depositSnapshot.docs[0]; // Assuming only one deposit document exists for simplicity
+          await updateDoc(doc(db, 'deposits', depositDoc.id), {
+            amount,
+            proofOfPayment: downloadURL,
+            status: 'pending',
+            firstName,
+            lastName,
+          });
+        } else {
+          // If deposit does not exist, create a new one
+          await addDoc(collection(db, 'deposits'), {
+            uid: user.uid,
+            amount,
+            TotalAmount: 0, // Initial value for TotalAmount
+            proofOfPayment: downloadURL,
+            status: 'pending',
+            firstName,
+            lastName,
+            createdAt: new Date(),
+          });
+        }
+
+        setUploadStatus('Upload successful! Deposit registered.');
         setFile(null); // Reset file input
-      }, 2000);
+      } catch (error) {
+        setUploadStatus(`Upload failed: ${error.message}`);
+      }
     } else {
       setUploadStatus('Please select a file before uploading.');
     }
   };
 
   return (
-    <div className=" flex flex-col items-center justify-start md:p-8 max-w-xl w-full transition-transform duration-300 transform hover:scale-105 my-5 sm:my-5 md:my-5 lg:my-0">
-      <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8 ">
+    <div className="flex flex-col items-center justify-start md:p-8 max-w-xl w-full transition-transform duration-300 transform hover:scale-105 my-5 sm:my-5 md:my-5 lg:my-0">
+      <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8">
         {/* Upload Proof of Payment Section */}
-        <div className="bg-white shadow-md rounded-lg p-6 flex-grow ">
+        <div className="bg-white shadow-md rounded-lg p-6 flex-grow">
           <h3 className="text-xl font-semibold text-gray-900">Upload Proof of Payment</h3>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div

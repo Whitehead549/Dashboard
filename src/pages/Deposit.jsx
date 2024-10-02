@@ -15,6 +15,7 @@ const Deposit = () => {
   const [proceed, setProceed] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
+  const [depositDetails, setDepositDetails] = useState({}); // Store deposit details
   const MINIMUM_DEPOSIT = 100;
 
   useEffect(() => {
@@ -34,7 +35,29 @@ const Deposit = () => {
       }
     };
 
+
+      // Fetch deposit details (amount and status) from 'deposits' collection
+      const fetchDepositDetails = async () => {
+        try {
+          const depositCollection = collection(db, 'deposits');
+          const depositSnapshot = await getDocs(depositCollection);
+          const depositData = depositSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+           // Assuming you want to fetch the first deposit record for simplicity
+        if (depositData.length > 0) {
+          setDepositDetails(depositData[0]); // Set the first deposit data
+        }
+      } catch (err) {
+        setError('Failed to fetch deposit details');
+      }
+    };
+
     fetchWallets();
+
+    fetchDepositDetails();
   }, []);
 
   const handleWalletSelect = (event) => {
@@ -158,13 +181,13 @@ const Deposit = () => {
           {/* Amount Section */}
           <div className="flex flex-col">
             <h3 className="text-lg font-semibold text-gray-700">Amount</h3>
-            <p className="text-lg  text-green-600">${amount}</p>
+            <p className="text-lg  text-green-600">${depositDetails.amount}</p>
           </div>
 
           {/* Status Section */}
           <div className="flex flex-col">
             <h3 className="text-lg font-semibold text-gray-700">Status</h3>
-            <p className="text-lg  text-yellow-600">Pending</p>
+            <p className="text-lg  text-yellow-600">{depositDetails.status}</p>
           </div>
         </div>
       </div>
@@ -250,7 +273,7 @@ const Deposit = () => {
           )}
         </div>
       
-        <UploadPage/>
+        {proceed  && (<UploadPage amount={amount}/>)}
         
    
       <div className='my-4'>
