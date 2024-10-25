@@ -5,6 +5,7 @@ import { FaArrowDown, FaArrowUp, FaClock, FaChartLine } from 'react-icons/fa';
 import { db, auth } from '../Config/Config'; // Adjust based on your file structure
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import Modal from "../components/Essentials/Modal";
 
 // StatCard component for the Total Deposits card
 const StatCard = ({ name, icon: Icon, value, color, textColor = '' }) => {
@@ -33,7 +34,7 @@ const SubscriptionPlanCard = ({ title, price, min, max, duration, roi, amount, o
       <div className='text-center items-center'>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">{title}</h2>
         <p className="text-xl font-bold mb-4">
-          <span className="text-gray-600">$</span>
+          <span className="text-gray-600"></span>
           <span className="text-blue-600">{price}</span>
         </p>
       </div>
@@ -85,14 +86,18 @@ const InvestmentPlans = () => {
     premium: 0,
   });
 
-  const [totalAmount, setTotalAmount] = useState(0); 
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);  // To control the modal visibility
+  const [modalMessage, setModalMessage] = useState('');   // To store the modal message
+ 
 
    // Step 1: Move the fetching logic directly into useEffect
   useEffect(() => {
     const fetchTotalAmount = async () => {
       const user = auth.currentUser;
       if (!user) {
-        alert('Please log in.');
+        setModalMessage('Please log in.');
+        setIsModalOpen(true);  // Open modal
         return;
       }
 
@@ -116,80 +121,108 @@ const InvestmentPlans = () => {
     setAmount({ ...amount, [plan]: e.target.value });
   };
 
-  const handleInvest = async (plan, roi, titleplan) => {
+  const handleInvest = async (plan, roi, titleplan, min, max) => {
     const user = auth.currentUser;
     if (!user) {
-      alert('Please log in to invest.');
+      setModalMessage('Please log in to invest.');
+      setIsModalOpen(true);  // Open modal
       return;
     }
-
     const investmentAmount = parseFloat(amount[plan]);
-    const TotalEarnings = investmentAmount * roi;  // Use original ROI value for calculation
-    const AccountBalance = investmentAmount + TotalEarnings;
-       
-    try {
-      // 1. Subtract investmentAmount from the TotalAmount in the deposits collection
-      const depositsQuery = query(
-        collection(db, 'deposits'),
-        where('uid', '==', user.uid)
-      );
-      const depositsSnapshot = await getDocs(depositsQuery);
+    if (isNaN(investmentAmount) || investmentAmount <= 0) {
+      setModalMessage('Please enter a valid investment amount.');
+      setIsModalOpen(true);  // Open modal
+      return;
+    }
+  
+    // Check if the investment is within the allowed min and max range
+  if (investmentAmount < min) {
+    setModalMessage(`The amount you entered is below the minimum allowed for the ${plan.toUpperCase()} plan. Please invest at least $${min}.`);
+    setIsModalOpen(true);  // Open modal
+    return;
+  }
+  
+  if (investmentAmount > max) {
+    setModalMessage(`The amount you entered exceeds the maximum allowed for the ${plan.toUpperCase()} plan. Please invest no more than $${max}.`);
+    setIsModalOpen(true);  // Open modal
+    return;
+  }
 
-      depositsSnapshot.forEach(async (docSnapshot) => {
-        const depositData = docSnapshot.data();
-        const newTotalAmount = depositData.TotalAmount - investmentAmount;
+  
+  try {
+    const depositsQuery = query(
+      collection(db, 'deposits'),
+      where('uid', '==', user.uid)
+    );
+    const depositsSnapshot = await getDocs(depositsQuery);
+    let totalAmountInDb = null;
 
-        if (newTotalAmount >= 0) {
-          // Update the TotalAmount after subtracting the investment
-          await updateDoc(doc(db, 'deposits', docSnapshot.id), {
-            TotalAmount: newTotalAmount,
-          });
-          setTotalAmount(newTotalAmount);
-        } else {
-          alert('Not enough funds to make this investment.');
-          return;
-        }
+    depositsSnapshot.forEach((docSnapshot) => {
+      const depositData = docSnapshot.data();
+      if (depositData && depositData.TotalAmount !== undefined) {
+        totalAmountInDb = depositData.TotalAmount;
+      }
+    });
+    
+      // Step 2: Check if TotalAmount exists and is greater than investmentAmount
+      if (totalAmountInDb === null) {
+        alert('TotalAmount field does not exist in your deposits. Please check your account.');
+        return;
+      }
+  
+      if (totalAmountInDb < investmentAmount) {
+        setModalMessage('Insufficient funds. Your total deposits are less than the amount you wish to invest.');
+        setIsModalOpen(true);  // Open modal
+        return;
+      }
+  
+      const TotalEarnings = investmentAmount * roi;
+      const AccountBalance = investmentAmount + TotalEarnings;
+  
+      // Subtract investmentAmount from the TotalAmount in the deposits collection
+      const newTotalAmount = totalAmountInDb - investmentAmount;
+      await updateDoc(doc(db, 'deposits', depositsSnapshot.docs[0].id), {
+        TotalAmount: newTotalAmount,
       });
-
-      // 2. Update or create the AccountBalance collection
+      setTotalAmount(newTotalAmount);
+  
+      // Update or create the AccountBalance collection
       const accountBalanceDoc = doc(db, 'AccountBalance', user.uid);
       const accountBalanceSnapshot = await getDoc(accountBalanceDoc);
-
+  
       if (accountBalanceSnapshot.exists()) {
-        // Update the existing document
         await updateDoc(accountBalanceDoc, {
           AccountBalance: accountBalanceSnapshot.data().AccountBalance + AccountBalance,
           TotalEarnings: accountBalanceSnapshot.data().TotalEarnings + TotalEarnings,
           investmentAmount: accountBalanceSnapshot.data().investmentAmount + investmentAmount,
-          titleplan,  // Include the title of the subscribed plan
+          titleplan,  
         });
       } else {
-        // Create a new document if it doesn't exist
         await setDoc(accountBalanceDoc, {
           uid: user.uid,
           AccountBalance,
           TotalEarnings,
           investmentAmount,
-          titleplan,  // Include the title of the subscribed plan
+          titleplan,  
         });
       }
-
-      // 3. Create or update a document in the history collection
+  
+      // Create or update a document in the history collection
       const usersQuery = query(
         collection(db, 'users'),
         where('uid', '==', user.uid)
       );
       const usersSnapshot = await getDocs(usersQuery);
-
+  
       if (!usersSnapshot.empty) {
         const userData = usersSnapshot.docs[0].data();
         const { firstName, lastName } = userData;
-
+  
         const presentDate = new Date();
-        const durationDays = parseInt(plan === 'beginner' ? 10 : plan === 'advanced' ? 15 : 20); // Set duration based on plan
+        const durationDays = parseInt(plan === 'beginner' ? 10 : plan === 'advanced' ? 15 : 20);
         const futureDate = new Date(presentDate);
         futureDate.setDate(futureDate.getDate() + durationDays);
-
+  
         const historyDoc = doc(db, 'history', user.uid);
         await setDoc(historyDoc, {
           futureDate: futureDate.toISOString(),
@@ -197,19 +230,22 @@ const InvestmentPlans = () => {
           firstName,
           lastName,
           uid: user.uid,
-        }, { merge: true }); // Use merge to update if exists
-
-        alert(`Successfully invested $${investmentAmount} in the ${plan.toUpperCase()} plan!`);
+        }, { merge: true });
+  
+     
+        setModalMessage(`Successfully invested $${investmentAmount} in the ${plan.toUpperCase()} plan!`);
+        setIsModalOpen(true);  // Open modal
       } else {
-        alert('User data not found in the database.');
+        setModalMessage('User data not found in the database.');
+        setIsModalOpen(true);  // Open modal
       }
     } catch (error) {
       console.error('Error updating account balance: ', error);
-      alert('Failed to invest. Please try again later.');
+      setModalMessage('Failed to invest. Please try again later.');
+      setIsModalOpen(true);  // Open modal
     }
   };
-
- 
+  
 
   return (
     <>
@@ -226,46 +262,49 @@ const InvestmentPlans = () => {
 
         {/* Plans Container */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
-          {/* Plan 1: BEGINNER */}
-          <SubscriptionPlanCard 
-            title="BEGINNER PLAN"
-            price="100"
-            min="100"
-            max="999"
-            duration="10 DAYS"
-            roi={1}  // ROI used in calculations
-            amount={amount.beginner}
-            onAmountChange={(e) => handleInputChange(e, 'beginner')}
-            onInvest={() => handleInvest('beginner', 1, 'BEGINNER PLAN')}
-          />
+        <SubscriptionPlanCard 
+        title="BEGINNER PLAN"
+        min={100}
+        max={999}
+        duration="10 DAYS"
+        roi={1}
+        amount={amount.beginner}
+        onAmountChange={(e) => handleInputChange(e, 'beginner')}
+        onInvest={() => handleInvest('beginner', 1, 'BEGINNER PLAN', 100, 999)}
+      />
 
-          {/* Plan 2: ADVANCED */}
-          <SubscriptionPlanCard 
-            title="ADVANCED PLAN"
-            price="1000"
-            min="1000"
-            max="9999"
-            duration="15 DAYS"
-            roi={3}  // ROI used in calculations
-            amount={amount.advanced}
-            onAmountChange={(e) => handleInputChange(e, 'advanced')}
-            onInvest={() => handleInvest('advanced', 3, 'ADVANCED PLAN')}
-          />
+      <SubscriptionPlanCard 
+        title="ADVANCED PLAN"
+        min={1000}
+        max={9999}
+        duration="15 DAYS"
+        roi={3}
+        amount={amount.advanced}
+        onAmountChange={(e) => handleInputChange(e, 'advanced')}
+        onInvest={() => handleInvest('advanced', 3, 'ADVANCED PLAN', 1000, 9999)}
+      />
 
-          {/* Plan 3: PROFESSIONAL */}
-          <SubscriptionPlanCard 
-            title="PROFESSIONAL PLAN"
-            price="10000"
-            min="10000"
-            max="100000"
-            duration="20 DAYS"
-            roi={5}  // ROI used in calculations
-            amount={amount.premium}
-            onAmountChange={(e) => handleInputChange(e, 'premium')}
-            onInvest={() => handleInvest('premium', 5, 'PROFESSIONAL PLAN')}
-          />
+      <SubscriptionPlanCard 
+        title="PREMIUM PLAN"
+        min={10000}
+        max={100000}
+        duration="20 DAYS"
+        roi={5}
+        amount={amount.premium}
+        onAmountChange={(e) => handleInputChange(e, 'premium')}
+        onInvest={() => handleInvest('premium', 5, 'PREMIUM PLAN', 10000, 100000)}
+      />
+
         </div>
       </div>
+
+      <Modal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  title="Status"
+  message={modalMessage}
+/>
+
     </>
   );
 };

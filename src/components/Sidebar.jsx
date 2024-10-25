@@ -1,14 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaHome, FaUser, FaMoneyBillWave, FaChartLine, FaHandHoldingUsd, FaHistory} from 'react-icons/fa'; // Import icons
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Set mobile view for widths < 768px
+    };
+
+    handleResize(); // Call on component mount
+    window.addEventListener('resize', handleResize); // Add resize listener
+
+    return () => window.removeEventListener('resize', handleResize); // Cleanup listener on unmount
+  }, []);
+
   return (
     <aside 
       className={`fixed inset-y-0 left-0 transform ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0 md:static md:inset-auto md:w-64 w-64 transition-transform duration-200 ease-in-out bg-gray-800 text-white z-50`} // Add z-index to ensure it appears above other content
-      style={{ zIndex: 50 }} // Add inline z-index for extra assurance
+      } md:translate-x-0 md:static md:inset-auto md:w-64 w-64 transition-transform duration-200 ease-in-out bg-gray-800 text-white z-50`}
+      style={isMobile ? { zIndex: 90 } : {}} // Apply zIndex: 90 only for mobile views
     >
       {/* Sidebar Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -26,7 +40,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <li>
             <Link to="/" className="flex items-center px-4 py-2 hover:bg-gray-700 font-semibold text-lg py-3" onClick={onClose}>
               <FaHome className="mr-3" /> {/* Icon */}
-              Home
+              Dashboard
             </Link>
           </li>
           <li>
@@ -44,7 +58,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <li>
             <Link to="/Investmentplans" className="flex items-center px-4 py-2 hover:bg-gray-700 font-semibold text-lg py-3" onClick={onClose}>
               <FaChartLine  className="mr-3" /> {/* Icon */}
-              Investmentplans
+              Investment Plans
             </Link>
           </li>
           <li>
@@ -59,7 +73,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               History
             </Link>
           </li>
-             
         </ul>
       </nav>
     </aside>
@@ -67,4 +80,3 @@ const Sidebar = ({ isOpen, onClose }) => {
 };
 
 export default Sidebar;
-

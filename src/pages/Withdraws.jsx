@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  setDoc,
-  addDoc, // Importing addDoc
-} from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, addDoc, onSnapshot } from "firebase/firestore"; 
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Config/Config"; // Firebase auth
 import Modal from "../components/popups/Modal"; // Import the Modal component
+import TransactionDetailsCard from "../components/Essentials/TransactionDetailsCard";
 
 const Withdraws = () => {
   const [walletType, setWalletType] = useState("");
@@ -27,6 +17,7 @@ const Withdraws = () => {
   const db = getFirestore();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const [withdrawId, setWithdrawId] = useState(null); // State to hold the ID of the withdrawal
 
   // Authenticate user when they visit the page
   useEffect(() => {
@@ -85,63 +76,42 @@ const Withdraws = () => {
 
     const userId = user.uid;
 
+      // Step 5: Fetch user details from the 'users' collection
+      const userQuery = query(collection(db, "users"), where("uid", "==", userId));
+      const userSnapshot = await getDocs(userQuery);
+
+      if (userSnapshot.empty) {
+        setError("User details not found in the 'users' collection.");
+        setLoading(false);
+        return;
+      }
+
+      // Assuming user details are stored in the first document found
+      const userData = userSnapshot.docs[0].data();
+      const { firstName, lastName } = userData;
+
     try {
-      // Step 1: Fetch the user's account balance
-      const accountRef = doc(db, "AccountBalance", userId);
-      const accountSnap = await getDoc(accountRef);
+      // Step 1: Create or update the withdraw record in the 'withdraws' collection
+      const withdrawRef = query(collection(db, "withdraws"), where("uid", "==", userId));
+      const withdrawRefSnapshot = await getDocs(withdrawRef);
+      let withdrawDocId;
 
-      if (accountSnap.exists()) {
-        const { TotalAccountBalance } = accountSnap.data();
-
-        // Step 2: Check if amountWithdraw is less than TotalAccountBalance
-        if (parseFloat(amount) > TotalAccountBalance) {
-          setError("Insufficient balance for the withdrawal.");
-          setLoading(false);
-          return;
-        }
-
-        // Step 3: Subtract amountWithdraw from TotalAccountBalance
-        const newBalance = TotalAccountBalance - parseFloat(amount);
-
-        // Step 4: Update the TotalAccountBalance in Firestore
-        await updateDoc(accountRef, {
-          TotalAccountBalance: newBalance,
-        });
-
-        // Step 5: Fetch user details from the 'users' collection
-        const userQuery = query(collection(db, "users"), where("uid", "==", userId));
-        const userSnapshot = await getDocs(userQuery);
-
-        if (userSnapshot.empty) {
-          setError("User details not found in the 'users' collection.");
-          setLoading(false);
-          return;
-        }
-
-        // Assuming user details are stored in the first document found
-        const userData = userSnapshot.docs[0].data();
-        const { firstName, lastName } = userData;
-
-        // Step 6: Create or update the withdraw record in the 'withdraws' collection
-        const withdrawRef = query(collection(db, "withdraws"), where("uid", "==", userId));
-        const withdrawRefSnapshot = await getDocs(withdrawRef);
-
-        if (!withdrawRefSnapshot.empty) {
-          // If withdraw exists, update it with the new data
-          const withdrawDoc = withdrawRefSnapshot.docs[0];
-          await updateDoc(doc(db, "withdraws", withdrawDoc.id), {
-            amountWithdraw: parseFloat(amount),
+      if (!withdrawRefSnapshot.empty) {
+        // If withdraw exists, update it with the new data
+        withdrawDocId = withdrawRefSnapshot.docs[0].id;
+        await updateDoc(doc(db, "withdraws", withdrawDocId), {
+          amountWithdraw: parseFloat(amount),
             status: "pending",
             firstName,
             lastName,
             uid: userId,
             WalletType: walletType,
             WalletAddress: walletAddress,
-          });
-        } else {
-          // Create a new withdrawal record
-          await addDoc(collection(db, "withdraws"), { // Changed 'deposits' to 'withdraws'
-            amountWithdraw: parseFloat(amount),
+        });
+      } else {
+        // Create a new withdrawal record
+        const newWithdrawDoc = await addDoc(collection(db, "withdraws"), {
+          amountWithdraw: parseFloat(amount),
             status: "pending",
             Totalwithdraw: 0,
             firstName,
@@ -149,19 +119,60 @@ const Withdraws = () => {
             uid: userId,
             WalletType: walletType,
             WalletAddress: walletAddress,
-          });
-        }
-
-        // Show success message in modal
-        setSuccess("Withdrawal request submitted successfully. Please allow time for processing.");
-        setIsModalOpen(true); // Open the modal
-      } else {
-        setError("Account balance not found.");
+        });
+        withdrawDocId = newWithdrawDoc.id; // Get the new document ID
       }
+
+      setWithdrawId(withdrawDocId); // Save the withdrawal ID for monitoring
+
+      // Show success message in modal
+      setSuccess("Withdrawal request submitted successfully. Please allow time for processing.");
+      setIsModalOpen(true); // Open the modal
+
+      // Step 2: Set up a listener to monitor the withdrawal status
+      const withdrawDocRef = doc(db, "withdraws", withdrawDocId);
+      const unsubscribe = onSnapshot(withdrawDocRef, async (doc) => {
+        const data = doc.data();
+        if (data && data.status === "approved") {
+          // Proceed to deduct from the TotalAccountBalance
+          await deductFromAccountBalance(userId, parseFloat(amount));
+          unsubscribe(); // Stop listening after deduction
+        }
+      });
+
     } catch (error) {
       setError("An error occurred: " + error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deductFromAccountBalance = async (userId, amount) => {
+    try {
+      const accountRef = doc(db, "AccountBalance", userId);
+      const accountSnap = await getDoc(accountRef);
+
+      if (accountSnap.exists()) {
+        const { TotalAccountBalance } = accountSnap.data();
+
+        // Check if amountWithdraw is less than TotalAccountBalance
+        if (amount > TotalAccountBalance) {
+          setError("Insufficient balance for the withdrawal.");
+          return;
+        }
+
+        // Subtract amountWithdraw from TotalAccountBalance
+        const newBalance = TotalAccountBalance - amount;
+
+        // Update the TotalAccountBalance in Firestore
+        await updateDoc(accountRef, {
+          TotalAccountBalance: newBalance,
+        });
+      } else {
+        setError("Account balance not found.");
+      }
+    } catch (error) {
+      setError("An error occurred while deducting the balance: " + error.message);
     }
   };
 
@@ -176,10 +187,8 @@ const Withdraws = () => {
         <>
           <h1 className="text-2xl font-bold mb-4">Withdraw</h1>
           <div className="flex flex-col items-center justify-center">
-            <div className="bg-white shadow-lg rounded-lg p-6 mb-4 w-full max-w-md">
-              <h2 className="text-xl font-semibold text-gray-700 mb-4">Account Balance</h2>
-              <p className="text-2xl font-bold text-gray-900">${accountBalance}</p> {/* Display actual account balance */}
-            </div>
+            {/* Add the Status card here */}
+            <TransactionDetailsCard/>
 
             <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md mb-8">
               <div className="mb-4">

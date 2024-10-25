@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../Config/Config'; // Adjust the import based on your file structure
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { FaCopy } from 'react-icons/fa'; // Importing the copy icon from react-icons
 import UploadPage from '../components/Essentials/UploadPage';
-
+import { auth } from '../Config/Config'; // Assuming you are using Firebase Auth
 
 const Deposit = () => {
   const [wallets, setWallets] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [walletAddress, setWalletAddress] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(''); // Ensure it's a string to handle empty state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [proceed, setProceed] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
-  const [depositDetails, setDepositDetails] = useState({}); // Store deposit details
+  const [status, setStatus] = useState('');
   const MINIMUM_DEPOSIT = 100;
 
   useEffect(() => {
@@ -35,30 +35,51 @@ const Deposit = () => {
       }
     };
 
-
-      // Fetch deposit details (amount and status) from 'deposits' collection
-      const fetchDepositDetails = async () => {
-        try {
-          const depositCollection = collection(db, 'deposits');
-          const depositSnapshot = await getDocs(depositCollection);
-          const depositData = depositSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-           // Assuming you want to fetch the first deposit record for simplicity
-        if (depositData.length > 0) {
-          setDepositDetails(depositData[0]); // Set the first deposit data
-        }
-      } catch (err) {
-        setError('Failed to fetch deposit details');
-      }
-    };
-
     fetchWallets();
-
-    fetchDepositDetails();
   }, []);
+
+  useEffect(() => {
+    // Listen for authentication state changes
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => { // CHANGE 1: Using onAuthStateChanged
+      if (user) {
+        const uid = user.uid; // Get the logged-in user's UID
+  
+        // Real-time subscription to the user's deposits collection
+        const depositsCollection = collection(db, 'deposits');
+        const userDepositsQuery = query(depositsCollection, where('uid', '==', uid)); // Query deposits for this user
+  
+        const unsubscribeDeposits = onSnapshot(
+          userDepositsQuery,
+          (snapshot) => {
+            const depositsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  
+            if (depositsData.length > 0) {
+              const latestDeposit = depositsData[0];
+              setAmount(latestDeposit.amount || '0');
+              setStatus(latestDeposit.status || 'No status');
+            } else {
+              setAmount('0');
+              setStatus('None');
+            }
+          },
+          (error) => {
+            console.error('Error fetching deposits: ', error);
+            setError('Failed to fetch deposit data');
+          }
+        );
+  
+        // Cleanup deposits subscription on unmount
+        return () => unsubscribeDeposits(); // CHANGE 2: Unsubscribe from deposits on unmount
+      } else {
+        setError('User not authenticated');
+        setLoading(false);
+      }
+    });
+  
+    // Cleanup auth subscription on unmount
+    return () => unsubscribeAuth(); // CHANGE 3: Unsubscribe from auth listener on unmount
+  }, []);
+  
 
   const handleWalletSelect = (event) => {
     const selectedWalletType = event.target.value;
@@ -174,24 +195,27 @@ const Deposit = () => {
           </div>
         )}
 
-          {/* Amount and status section */}
-      <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105 mb-6">
-        <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Transaction Details</h2>
-        <div className="flex justify-between mb-4">
-          {/* Amount Section */}
-          <div className="flex flex-col">
-            <h3 className="text-lg font-semibold text-gray-700">Amount</h3>
-            <p className="text-lg  text-green-600">${depositDetails.amount}</p>
-          </div>
+        {/* Amount and status section */}
+        <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105 mb-6">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800 font-sans">Transaction Details</h2>
+          <div className="flex justify-between mb-4">
+            {/* Amount Section */}
+            <div className="flex flex-col">
+              <h3 className="text-lg font-semibold text-gray-700">Amount</h3>
+              <p className="text-lg text-green-600">${amount}</p>
+            </div>
 
-          {/* Status Section */}
-          <div className="flex flex-col">
-            <h3 className="text-lg font-semibold text-gray-700">Status</h3>
-            <p className="text-lg  text-yellow-600">{depositDetails.status}</p>
+            {/* Status Section */}
+            <div className="flex flex-col">
+              <h3 className="text-lg font-semibold text-gray-700">Status</h3>
+              <p className="text-lg text-yellow-600">
+                {status === "approved" ? "None" : status}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-          
+
+
 
         <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 max-w-lg w-full transition-transform duration-300 transform hover:scale-105">
           {!proceed ? (

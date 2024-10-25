@@ -7,7 +7,7 @@ const WelcomePopup = ({ onProceed, onClose }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg text-center">
         <h2 className="text-lg font-semibold">Welcome!</h2>
         <p className="text-gray-700 my-4">
-          Is your default language English? Click below to proceed, or select another language first.
+           Select your language below before clicking "Proceed"
         </p>
         <button
           onClick={onProceed}

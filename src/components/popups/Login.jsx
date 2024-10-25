@@ -76,6 +76,7 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          
           <button
             type="button"
             onClick={togglePasswordVisibility}
@@ -84,6 +85,11 @@ const Login = () => {
             {passwordVisible ? <EyeOff /> : <Eye />}
           </button>
         </div>
+
+        {/* Forget Password Link */}
+        <Link to="/Verifyempwd" className="text-blue-600 hover:underline ml-auto block text-right my=0">
+          Forgot Password?
+        </Link>
 
         {/* Sign In Button */}
         <button

@@ -127,8 +127,8 @@ const ProfilePage = () => {
               <input type="file" className="hidden" onChange={handleFileChange} />
             </label>
             <button
-              className={`bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 ${
-                loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 transition'
+              className={`bg-green-600 text-white px-4 py-2 rounded-lg ml-2 ${
+                loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700 transition'
               }`}
               onClick={handleUploadPicture}
               disabled={loading}
@@ -160,10 +160,10 @@ const ProfilePage = () => {
         </div>
         <div className="mt-6 flex justify-end space-x-4">
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-blue-700 transition"
+            className="bg-blue-700 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-blue-800 transition"
             onClick={handleSaveProfile}
           >
-            Save Changes
+            Save
           </button>
           <button className="bg-gray-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-gray-700 transition">
             Cancel
@@ -175,7 +175,7 @@ const ProfilePage = () => {
       <div className="bg-white p-6 rounded-lg shadow-md mb-4 w-full">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
-          {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
+          {['CurrentPassword', 'NewPassword', 'ConfirmPassword'].map((field, index) => (
             <div className="flex items-center" key={index}>
               <Lock className="mr-2" />
               <input
@@ -192,10 +192,10 @@ const ProfilePage = () => {
         </div>
         <div className="mt-6 flex justify-end space-x-4">
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-blue-700 transition"
+            className="bg-blue-700 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-blue-800 transition"
             onClick={handleSavePassword}
           >
-            Update Password
+            Update
           </button>
           <button className="bg-gray-600 text-white px-4 py-2 rounded-md w-full md:w-auto hover:bg-gray-700 transition">
             Cancel

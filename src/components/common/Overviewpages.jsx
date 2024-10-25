@@ -54,12 +54,13 @@ const OverviewPage = ({countdown, AccountBalance, TotalEarnings, TotalDeposits, 
 				icon={Timer} 
 				value={
 					<span className="text-2xl sm:text-2xl md:text-2xl lg:text-2xl xl:text-2xl">
-						{countdown}
+					{countdown ? countdown : 'None'}
 					</span>
 				}
 				color='#F59E0B' 
 				textColor='text-white' 
-			/>
+				/>
+
 
 
 				{/* 6. Plans */}
