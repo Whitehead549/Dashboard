@@ -14,16 +14,15 @@ const VerifyEmPwd = () => {
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   
     if (isAndroid) {
-      // Updated intent for Gmail inbox on Android
-      window.location.href = "intent://#Intent;package=com.google.android.gm;end";
+      window.location.href = "intent://#Intent;scheme=googlegmail;package=com.google.android.gm;end";
     } else if (isIOS) {
-      // Gmail app URL scheme for iOS
       window.location.href = "googlegmail://";
     } else {
-      // Web-based Gmail for desktop or unsupported devices
       window.location.href = "https://mail.google.com";
     }
   };
+  
+  
   
 
   const handleResetPassword = async (e) => {
