@@ -12,15 +12,19 @@ const VerifyEmPwd = () => {
   const openGmail = () => {
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
+  
     if (isAndroid) {
-      window.location.href = "intent://inbox/#Intent;scheme=mailto;package=com.google.android.gm;end";
+      // Updated intent for Gmail inbox on Android
+      window.location.href = "intent://#Intent;package=com.google.android.gm;end";
     } else if (isIOS) {
+      // Gmail app URL scheme for iOS
       window.location.href = "googlegmail://";
     } else {
+      // Web-based Gmail for desktop or unsupported devices
       window.location.href = "https://mail.google.com";
     }
   };
+  
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
