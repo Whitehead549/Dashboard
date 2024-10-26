@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from '../Config/Config';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Essentials/Modal';
 
 
@@ -8,39 +9,28 @@ const VerifyEmPwd = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openGmail = () => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  
-    if (isAndroid) {
-      window.location.href = "intent://#Intent;scheme=googlegmail;package=com.google.android.gm;end";
-    } else if (isIOS) {
-      window.location.href = "googlegmail://";
-    } else {
-      window.location.href = "https://mail.google.com";
-    }
-  };
-  
-  
-  
+  const navigate = useNavigate();
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
       await sendPasswordResetEmail(auth, email);
-      setMessage(`Password reset email sent to ${email}. Click below to check your inbox.`);
-      setEmail('');
+      setMessage(`Password reset email sent to ${email}`);
+      setEmail(''); // Clear the input after successful reset
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     } finally {
-      setIsModalOpen(true);
+      setIsModalOpen(true); // Open the modal after setting the message
     }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setMessage('');
+    setMessage(''); // Optionally reset the message when closing the modal
+  };
+
+  const navigateToRegistration = () => {
+    navigate('/Dashboard'); // Replace '/register' with your actual registration route
   };
 
   return (
@@ -64,13 +54,22 @@ const VerifyEmPwd = () => {
           </button>
         </form>
 
+        {/* New Navigation Button */}
+        <div className="text-left mt-4">
+          <button
+            onClick={navigateToRegistration}
+            className="text-blue-600 hover:underline font-semibold"
+          >
+            Sign In
+          </button>
+        </div>
+
         {/* Modal Component */}
         <Modal
           isOpen={isModalOpen}
           onClose={closeModal}
           title="Password Reset"
           message={message}
-          onGmailClick={openGmail} // Pass Gmail function to Modal
         />
       </div>
     </div>

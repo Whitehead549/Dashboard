@@ -38,7 +38,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <nav className="mt-8">
         <ul>
           <li>
-            <Link to="/" className="flex items-center px-4 py-2 hover:bg-gray-700 font-semibold text-lg py-3" onClick={onClose}>
+            <Link to="/Dashboard" className="flex items-center px-4 py-2 hover:bg-gray-700 font-semibold text-lg py-3" onClick={onClose}>
               <FaHome className="mr-3" /> {/* Icon */}
               Dashboard
             </Link>

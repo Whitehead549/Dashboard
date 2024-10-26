@@ -10,7 +10,7 @@ const Header = ({ onSidebarToggle }) => {
 
   const handleLogout = () => {
     auth.signOut().then(()=>{
-      navigate('/Dashboard');
+      navigate('/');
 
     })
 

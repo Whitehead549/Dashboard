@@ -30,7 +30,7 @@ const Registration = () => {
           <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-95">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-xs w-full text-center">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Welcome!</h2>
-              <p className="text-gray-600 mb-4">Is your default language English? Click below to proceed, or select another language first.</p>
+              <p className="text-gray-600 mb-4">Select your language below before clicking "Proceed".</p>
               <Translate />
               <button
                 onClick={handleProceed}

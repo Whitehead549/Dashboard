@@ -23,7 +23,7 @@ const Login = () => {
         setErrorMsg('');
         setTimeout(() => {
           setSuccessMsg('');
-          navigate('/');
+          navigate('/Dashboard');
         }, 3000);
       })
       .catch((error) => {

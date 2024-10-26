@@ -301,7 +301,7 @@ const InvestmentPlans = () => {
       <Modal
   isOpen={isModalOpen}
   onClose={() => setIsModalOpen(false)}
-  title="Status"
+  title="Result"
   message={modalMessage}
 />
 

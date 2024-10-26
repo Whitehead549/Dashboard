@@ -17,10 +17,10 @@ function App() {
   return (
     <Router>
       <Routes>
-       <Route path="Dashboard" element={<Registration />} />
+       <Route index element={<Registration />} />
        <Route path="Verifyempwd" element={<VerifyEmPwd/>} />
         <Route path="/" element={<DashboardLayout />}>
-          <Route index element={<Home />} />
+          <Route path="Dashboard" element={<Home />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
           <Route path="Deposit" element={<Deposit />} />
