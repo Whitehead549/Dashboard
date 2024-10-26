@@ -1,5 +1,5 @@
 // src/layouts/DashboardLayout.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
@@ -8,6 +8,23 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  useEffect(() => {
+    // Initialize Tawk.to
+    var Tawk_API = Tawk_API || {};
+    var Tawk_LoadStart = new Date();
+    var s1 = document.createElement('script');
+    s1.async = true;
+    s1.src = 'https://embed.tawk.to/671ce9032480f5b4f5943b44/1ib4esdsh';
+    s1.charset = 'UTF-8';
+    s1.setAttribute('crossorigin', '*');
+    document.head.appendChild(s1);
+
+    return () => {
+      // Cleanup to remove Tawk.to script when the component unmounts
+      document.head.removeChild(s1);
+    };
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-200">
