@@ -11,6 +11,7 @@ const Home = () => {
     const [userId, setUserId] = useState(null);
     const navigate = useNavigate();
 
+    const [Firstname, setFirstname] = useState('');
     const [AccountBalance, setAccountBalance] = useState(0);
     const [TotalEarnings, setTotalEarnings] = useState(0);
     const [TotalDeposits, setTotalDeposits] = useState(0);
@@ -26,6 +27,17 @@ const Home = () => {
             }
 
             setUserId(user.uid);
+
+             // Listen for changes in TotalDeposits
+             const firstNameQuery = query(collection(db, "users"), where("uid", "==", user.uid));
+             onSnapshot(firstNameQuery, (firstSnapshot) => {
+                 if (!firstSnapshot.empty) {
+                     setFirstname(firstSnapshot.docs[0].data().firstName || "username");
+                 } else {
+                    setFirstname('username'); // Set to 0 if no document exists
+                 }
+             });
+ 
 
             // Listen for changes in TotalDeposits
             const depositsQuery = query(collection(db, "deposits"), where("uid", "==", user.uid));
@@ -215,12 +227,19 @@ const Home = () => {
     };
 
     return (
+        <>
+        <h1 className="text-2xl font-bold mb-2 mt-0">Dashboard</h1>
+        <h1 className="text-md font-semibold text-blue-900 mb-0 mt-0">
+        Welcome, <span className="text-gray-700">{Firstname}</span>!
+        </h1>
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-            <OverviewPage countdown={countdown} AccountBalance={AccountBalance} TotalEarnings={TotalEarnings} 
+           
+          
+           <OverviewPage countdown={countdown} AccountBalance={AccountBalance} TotalEarnings={TotalEarnings} 
             TotalDeposits={TotalDeposits} TotalWithdrawals={TotalWithdrawals} Plan={Plan} />
             <TradingViewChart />
         </div>
+        </>
     );
 };
 
