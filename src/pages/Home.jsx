@@ -229,7 +229,7 @@ const Home = () => {
     return (
         <>
         <h1 className="text-2xl font-bold mb-2 mt-0">Dashboard</h1>
-        <h1 className="text-md font-semibold text-blue-900 mb-0 mt-0">
+        <h1 className="text-md font-medium text-blue-900 mb-0 mt-0">
         Welcome, <span className="text-gray-700">{Firstname}</span>!
         </h1>
         <div className="p-4">
