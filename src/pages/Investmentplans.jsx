@@ -4,7 +4,7 @@ import { DollarSign } from 'lucide-react';
 import { FaArrowDown, FaArrowUp, FaClock, FaChartLine } from 'react-icons/fa';
 import { db, auth } from '../Config/Config'; // Adjust based on your file structure
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot} from 'firebase/firestore';
 import Modal from "../components/Essentials/Modal";
 
 // StatCard component for the Total Deposits card
@@ -128,6 +128,15 @@ const InvestmentPlans = () => {
       setIsModalOpen(true);  // Open modal
       return;
     }
+
+     // Check if AccountBalance is low
+     if (AccountBalance !== 0) {
+      setModalMessage("You have an ongoing Plan");
+      setIsModalOpen(true); // Open modal
+      return;
+  }
+
+
     const investmentAmount = parseFloat(amount[plan]);
     if (isNaN(investmentAmount) || investmentAmount <= 0) {
       setModalMessage('Please enter a valid investment amount.');
@@ -245,6 +254,30 @@ const InvestmentPlans = () => {
       setIsModalOpen(true);  // Open modal
     }
   };
+
+
+  // Listen for changes in AccountBalance
+const [AccountBalance, setAccountBalance] = useState(0);
+
+useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+        const accountBalanceQuery = query(
+            collection(db, "AccountBalance"),
+            where("uid", "==", user.uid)
+        );
+
+        const unsubscribe = onSnapshot(accountBalanceQuery, (accountBalanceSnapshot) => {
+            if (!accountBalanceSnapshot.empty) {
+                setAccountBalance(accountBalanceSnapshot.docs[0].data().AccountBalance);
+            } else {
+                setAccountBalance(0); // Set to 0 if no document exists
+            }
+        });
+
+        return () => unsubscribe(); // Cleanup the listener on unmount
+    }
+}, []);
   
 
   return (
@@ -263,7 +296,7 @@ const InvestmentPlans = () => {
         {/* Plans Container */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         <SubscriptionPlanCard 
-        title="BEGINNER PLAN"
+        title="BEGINNER'S PLAN"
         min={100}
         max={999}
         duration="10 DAYS"

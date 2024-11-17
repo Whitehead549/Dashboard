@@ -120,7 +120,7 @@ const Deposit = () => {
             <li>Send Only BITCOIN to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>Ensure to click on the save deposit button below after sending the coin.</li>
+            <li>For verification purposes, please upload the payment proof.</li>
           </ul>
         );
       case 'USDT(TRC 20)':
@@ -129,7 +129,7 @@ const Deposit = () => {
             <li>Send Only USDT TETHER (TRC20) to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>Ensure to click on the save deposit button below after sending the coin.</li>
+            <li>For verification purposes, please upload the payment proof.</li>
           </ul>
         );
       case 'USDT (ERC 20)':
@@ -138,7 +138,7 @@ const Deposit = () => {
             <li>Send Only USDT TETHER (ERC20) to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>Ensure to click on the save deposit button below after sending the coin.</li>
+            <li>For verification purposes, please upload the payment proof.</li>
           </ul>
         );
       case 'ETHEREUM':
@@ -147,7 +147,7 @@ const Deposit = () => {
             <li>Send Only ETHEREUM to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>Ensure to click on the save deposit button below after sending the coin.</li>
+            <li>For verification purposes, please upload the payment proof.</li>
           </ul>
         );
       default:

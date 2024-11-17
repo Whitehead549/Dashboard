@@ -87,19 +87,25 @@ const ProfilePage = () => {
     }
   };
 
+
   const handleSavePassword = async () => {
+    if (!passwords.currentPassword) {
+      setError('Current password is required!');
+      return;
+    }
+  
     if (passwords.newPassword !== passwords.confirmPassword) {
       setError('New passwords do not match!');
       return;
     }
-
+  
     try {
       const user = auth.currentUser;
       if (!user) {
         setError('No user is currently signed in.');
         return;
       }
-
+  
       const credential = EmailAuthProvider.credential(user.email, passwords.currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, passwords.newPassword);
@@ -108,6 +114,7 @@ const ProfilePage = () => {
       setError(error.message);
     }
   };
+  
 
   return (
     <div className="flex flex-col container mx-auto p-4 md:p-6 min-h-screen overflow-y-auto mb-8 sm:mb-8 lg:mb-8">
@@ -175,19 +182,20 @@ const ProfilePage = () => {
       <div className="bg-white p-6 rounded-lg shadow-md mb-4 w-full">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
-          {['CurrentPassword', 'NewPassword', 'ConfirmPassword'].map((field, index) => (
-            <div className="flex items-center" key={index}>
-              <Lock className="mr-2" />
-              <input
-                type="password"
-                name={field}
-                value={passwords[field]}
-                onChange={handlePasswordChange}
-                className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300"
-                placeholder={field.replace(/([A-Z])/g, ' $1').replace(/Password/, ' Password')}
-              />
-            </div>
-          ))}
+        {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
+  <div className="flex items-center" key={index}>
+    <Lock className="mr-2" />
+    <input
+      type="password"
+      name={field}
+      value={passwords[field]}
+      onChange={handlePasswordChange}
+      className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300"
+      placeholder={field.replace(/([A-Z])/g, ' $1').replace(/Password/, ' Password')}
+    />
+  </div>
+))}
+
           {error && <p className="text-red-500 text-center">{error}</p>}
         </div>
         <div className="mt-6 flex justify-end space-x-4">
