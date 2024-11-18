@@ -160,8 +160,8 @@ const Deposit = () => {
 
   return (
     <>
-      <h1 className="text-3xl md:text-3xl font-bold text-gray-800 mb-8 font-sans ">Deposit</h1>
-      <div className="  mx-auto px-4 md:px-8 lg:px-12 py-6 flex flex-col items-center sm:mr-4">
+      <h1 className="text-3xl md:text-3xl font-bold text-gray-800 mb-8 font-sans">Deposit</h1>
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 py-6 flex flex-col items-center sm:mr-4">
 
         {/* Custom Alert Modal for Minimum Deposit Validation */}
         {showAlert && (
@@ -272,43 +272,39 @@ const Deposit = () => {
               </button>
             </>
           ) : (
-            <div className="text-center p-4 md:p-6 lg:p-8 max-w-auto">
-              <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-800 font-sans">
-                Transaction Summary
-              </h2>
-            <div className="mb-2 md:mb-3">
-              <span className="font-medium text-gray-700">Selected Wallet Type:</span>
-              <div className="text-sm md:text-base font-semibold text-blue-600">
-                {selectedWallet.walletType}
-              </div>
-            </div>
-            <div className="mb-2 md:mb-3">
-              <span className="font-medium text-gray-700">Amount:</span>
-              <div className="text-sm md:text-base font-semibold text-blue-600">
-                ${amount}
-              </div>
-            </div>
-            <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-800 font-sans">
-              Wallet Address
-            </h2>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-              <div className="text-xs md:text-sm font-mono p-2 bg-gray-100 rounded-lg border border-gray-300 mb-1 sm:mb-0">
-                {walletAddress}
-              </div>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors duration-200"
-              >
-                <FaCopy size={20} />
-                <span className="text-sm font-medium">Copy</span>
-              </button>
+            <div className="text-center">
+  <h2 className="text-xl font-semibold mb-4 text-gray-800 font-sans">Transaction Summary</h2>
+  <div className="mb-4">
+    <span className="font-medium text-gray-700 block">Selected Wallet Type:</span>
+    <div className="text-base font-semibold text-blue-600 break-words">
+      {selectedWallet.walletType}
+    </div>
+  </div>
+  <div className="mb-4">
+    <span className="font-medium text-gray-700 block">Amount:</span>
+    <div className="text-base font-semibold text-blue-600">
+      ${amount}
+    </div>
+  </div>
+  <h2 className="text-xl font-semibold mb-4 text-gray-800 font-sans">Wallet Address</h2>
+  <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="text-sm font-mono p-2 bg-gray-100 rounded-lg border border-gray-300 overflow-hidden max-w-full break-all">
+      {walletAddress}
+    </div>
+    <button
+  onClick={copyToClipboard}
+  className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors duration-200"
+>
+  <FaCopy size={20} />
+  <span className="text-sm font-medium">Copy</span>
+</button>
 
-            </div>
-            <div className="text-xs md:text-sm text-gray-600 mt-2">
-              {getInstructionNote(selectedWallet.walletType)}
-            </div>
-          </div>
-          
+  </div>
+  <div className="text-sm text-gray-600 mt-4 max-w-prose mx-auto">
+    {getInstructionNote(selectedWallet.walletType)}
+  </div>
+</div>
+
           
           )}
         </div>
