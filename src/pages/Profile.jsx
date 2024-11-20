@@ -182,7 +182,7 @@ const ProfilePage = () => {
       <div className="bg-white p-6 rounded-lg shadow-md mb-4 w-full">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
-        {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
+        {['CurrentPassword', 'NewPassword', 'ConfirmPassword'].map((field, index) => (
   <div className="flex items-center" key={index}>
     <Lock className="mr-2" />
     <input

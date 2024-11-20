@@ -296,14 +296,14 @@ useEffect(() => {
         {/* Plans Container */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         <SubscriptionPlanCard 
-        title="BEGINNER'S PLAN"
+        title="BEGINNERS PLAN"
         min={100}
         max={999}
         duration="10 DAYS"
         roi={1}
         amount={amount.beginner}
         onAmountChange={(e) => handleInputChange(e, 'beginner')}
-        onInvest={() => handleInvest('beginner', 1, 'BEGINNER PLAN', 100, 999)}
+        onInvest={() => handleInvest('beginner', 1, 'BEGINNERS PLAN', 100, 999)}
       />
 
       <SubscriptionPlanCard 
