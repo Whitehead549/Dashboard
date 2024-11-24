@@ -4,6 +4,7 @@ import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestor
 import { FaCopy } from 'react-icons/fa'; // Importing the copy icon from react-icons
 import UploadPage from '../components/Essentials/UploadPage';
 import { auth } from '../Config/Config'; // Assuming you are using Firebase Auth
+import Modal from '../components/Essentials/Modal'; // Path to the Modal component
 
 const Deposit = () => {
   const [wallets, setWallets] = useState([]);
@@ -17,6 +18,18 @@ const Deposit = () => {
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [status, setStatus] = useState('');
   const MINIMUM_DEPOSIT = 100;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+
+  const showModal = (message) => {
+    setModalMessage(message);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalMessage('');
+  };
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -144,10 +157,10 @@ const Deposit = () => {
       case 'ETHEREUM':
         return (
           <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Send Only ETHEREUM to this address.</li>
+            <li>Send only ETHEREUM to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>For verification purposes, please upload the payment proof.</li>
+            <li>For verification purposes, please enter transaction hash.</li>
           </ul>
         );
       default:
@@ -309,12 +322,19 @@ const Deposit = () => {
           )}
         </div>
       
-        {proceed  && (<UploadPage amount={amount}/>)}
+        {proceed  && (<UploadPage amount={amount} onShowModal={showModal}/>)}
         
    
       <div className='my-4'>
 
       </div>
+      {/* Render the Modal in the parent */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title="Result"
+        message={modalMessage}
+      />
       </div>
     </>
   );
