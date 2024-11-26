@@ -20,9 +20,14 @@ const DashboardLayout = () => {
     script.setAttribute('crossorigin', '*');
 
     // Event listeners for debugging
-    script.onload = () => console.log('Tawk.to script loaded successfully');
-    script.onerror = (error) =>
-      console.error('Error loading Tawk.to script:', error);
+    script.onload = () => {
+      console.log('Tawk.to script loaded successfully');
+      window.Tawk_API = window.Tawk_API || {};
+      window.Tawk_API.onLoad = () => {
+        console.log('Tawk.to widget has fully loaded');
+      };
+    };
+    
 
     // Append the script to the head
     document.head.appendChild(script);
