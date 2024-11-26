@@ -10,24 +10,28 @@ const DashboardLayout = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   useEffect(() => {
-    // Initialize Tawk.to script
     console.log('Initializing Tawk.to script');
-    const s1 = document.createElement('script');
-    s1.async = true;
-    s1.src = 'https://embed.tawk.to/67460d802480f5b4f5a46323/default';
-    s1.charset = 'UTF-8';
-    s1.setAttribute('crossorigin', '*');
 
-    // Attach the script to the document head
-    document.head.appendChild(s1);
+    // Dynamically load the Tawk.to script
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://embed.tawk.to/674624d34304e3196ae916af/default';
+    script.charset = 'UTF-8';
+    script.setAttribute('crossorigin', '*');
 
-    console.log('Tawk.to script appended');
+    // Event listeners for debugging
+    script.onload = () => console.log('Tawk.to script loaded successfully');
+    script.onerror = (error) =>
+      console.error('Error loading Tawk.to script:', error);
 
-    // Cleanup function to remove the script when the component unmounts
+    // Append the script to the head
+    document.head.appendChild(script);
+
+    // Cleanup function to remove the script on unmount
     return () => {
       console.log('Cleaning up Tawk.to script');
-      if (s1.parentNode) {
-        document.head.removeChild(s1);
+      if (script.parentNode) {
+        document.head.removeChild(script);
       }
     };
   }, []);
