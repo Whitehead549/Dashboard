@@ -15,7 +15,7 @@ const DashboardLayout = () => {
     // Dynamically load the Tawk.to script
     const script = document.createElement('script');
     script.async = true;
-    script.src = 'https://embed.tawk.to/674624d34304e3196ae916af/default';
+    script.src = 'https://embed.tawk.to/674628752480f5b4f5a469fc/1idl0s3n9';
     script.charset = 'UTF-8';
     script.setAttribute('crossorigin', '*');
 
