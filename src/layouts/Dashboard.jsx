@@ -1,4 +1,3 @@
-// src/layouts/DashboardLayout.js
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../components/Header';
@@ -19,15 +18,9 @@ const DashboardLayout = () => {
     script.charset = 'UTF-8';
     script.setAttribute('crossorigin', '*');
 
-    // Event listeners for debugging
-    script.onload = () => {
-      console.log('Tawk.to script loaded successfully');
-      window.Tawk_API = window.Tawk_API || {};
-      window.Tawk_API.onLoad = () => {
-        console.log('Tawk.to widget has fully loaded');
-      };
-    };
-    
+    // Optional event listeners for debugging
+    script.onload = () => console.log('Tawk.to script loaded successfully');
+    script.onerror = (error) => console.error('Error loading Tawk.to script:', error);
 
     // Append the script to the head
     document.head.appendChild(script);
@@ -39,7 +32,7 @@ const DashboardLayout = () => {
         document.head.removeChild(script);
       }
     };
-  }, []);
+  }, []); // Empty dependency array to run only on mount and unmount
 
   return (
     <div className="flex h-screen bg-gray-200">
