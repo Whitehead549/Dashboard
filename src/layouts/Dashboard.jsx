@@ -10,19 +10,25 @@ const DashboardLayout = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   useEffect(() => {
-    // Initialize Tawk.to
-    var Tawk_API = Tawk_API || {};
-    var Tawk_LoadStart = new Date();
-    var s1 = document.createElement('script');
+    // Initialize Tawk.to script
+    console.log('Initializing Tawk.to script');
+    const s1 = document.createElement('script');
     s1.async = true;
     s1.src = 'https://embed.tawk.to/67460d802480f5b4f5a46323/default';
     s1.charset = 'UTF-8';
     s1.setAttribute('crossorigin', '*');
+
+    // Attach the script to the document head
     document.head.appendChild(s1);
 
+    console.log('Tawk.to script appended');
+
+    // Cleanup function to remove the script when the component unmounts
     return () => {
-      // Cleanup to remove Tawk.to script when the component unmounts
-      document.head.removeChild(s1);
+      console.log('Cleaning up Tawk.to script');
+      if (s1.parentNode) {
+        document.head.removeChild(s1);
+      }
     };
   }, []);
 
@@ -35,7 +41,7 @@ const DashboardLayout = () => {
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <Header onSidebarToggle={toggleSidebar} />
-        
+
         {/* Main Content */}
         <main className="flex-1 p-6 pt-20 overflow-y-auto">
           {/* Adding top padding (pt-20) to account for fixed header */}
