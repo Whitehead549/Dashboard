@@ -130,10 +130,10 @@ const Deposit = () => {
       case 'BITCOIN':
         return (
           <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Send Only BITCOIN to this address.</li>
+            <li>Send only BITCOIN to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>For verification purposes, please upload the payment proof.</li>
+            <li>For verification purposes, please enter transaction hash</li>
           </ul>
         );
       case 'USDT(TRC 20)':
