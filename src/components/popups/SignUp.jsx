@@ -61,10 +61,9 @@ const Signup = () => {
       setPhoneNumber('');
       setCountry('');
       setErrorMsg('');
-
       setTimeout(() => {
         setSuccessMsg('');
-        navigate('/');
+        navigate('/Dashboard');
       }, 3000);
     } catch (error) {
       if (error.code === 'auth/invalid-email') {
