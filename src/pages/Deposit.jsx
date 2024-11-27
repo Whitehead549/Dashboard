@@ -133,25 +133,25 @@ const Deposit = () => {
             <li>Send only BITCOIN to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>For verification purposes, please enter transaction hash</li>
+            <li>For verification purposes, please enter transaction hash.</li>
           </ul>
         );
       case 'USDT(TRC 20)':
         return (
           <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Send Only USDT TETHER (TRC20) to this address.</li>
+            <li>Send only USDT TETHER (TRC20) to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>For verification purposes, please upload the payment proof.</li>
+            <li>For verification purposes, please enter transaction hash.</li>
           </ul>
         );
       case 'USDT (ERC 20)':
         return (
           <ul className="list-disc list-inside text-left text-gray-600">
-            <li>Send Only USDT TETHER (ERC20) to this address.</li>
+            <li>Send only USDT TETHER (ERC20) to this address.</li>
             <li>Sending any other coin may result in permanent loss.</li>
             <li>Account will be credited after confirmation.</li>
-            <li>For verification purposes, please upload the payment proof.</li>
+            <li>For verification purposes, please enter transaction hash.</li>
           </ul>
         );
       case 'ETHEREUM':
