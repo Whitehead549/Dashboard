@@ -9,30 +9,21 @@ const DashboardLayout = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   useEffect(() => {
-    console.log('Initializing Tawk.to script');
-
     // Dynamically load the Tawk.to script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://embed.tawk.to/674628752480f5b4f5a469fc/1idl0s3n9';
-    script.charset = 'UTF-8';
-    script.setAttribute('crossorigin', '*');
+    const tawkScript = document.createElement('script');
+    tawkScript.src = 'https://embed.tawk.to/674628752480f5b4f5a469fc/1idl0s3n9';
+    tawkScript.async = true;
+    tawkScript.charset = 'UTF-8';
+    tawkScript.setAttribute('crossorigin', '*');
 
-    // Optional event listeners for debugging
-    script.onload = () => console.log('Tawk.to script loaded successfully');
-    script.onerror = (error) => console.error('Error loading Tawk.to script:', error);
+    // Append the script to the document body
+    document.body.appendChild(tawkScript);
 
-    // Append the script to the head
-    document.head.appendChild(script);
-
-    // Cleanup function to remove the script on unmount
+    // Cleanup function to remove the script when the component unmounts
     return () => {
-      console.log('Cleaning up Tawk.to script');
-      if (script.parentNode) {
-        document.head.removeChild(script);
-      }
+      document.body.removeChild(tawkScript);
     };
-  }, []); // Empty dependency array to run only on mount and unmount
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-200">
