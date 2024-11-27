@@ -11,7 +11,7 @@ const DashboardLayout = () => {
   useEffect(() => {
     // Dynamically load the Tawk.to script
     const tawkScript = document.createElement('script');
-    tawkScript.src = 'https://embed.tawk.to/674628752480f5b4f5a469fc/1idl0s3n9';
+    tawkScript.src = 'https://embed.tawk.to/674628752480f5b4f5a469fc/1idl0s3n9'; // Correct widget URL
     tawkScript.async = true;
     tawkScript.charset = 'UTF-8';
     tawkScript.setAttribute('crossorigin', '*');
@@ -19,11 +19,11 @@ const DashboardLayout = () => {
     // Append the script to the document body
     document.body.appendChild(tawkScript);
 
-    // Cleanup function to remove the script when the component unmounts
+    // Cleanup to remove script when component unmounts
     return () => {
       document.body.removeChild(tawkScript);
     };
-  }, []);
+  }, []); // Runs only once when the component mounts
 
   return (
     <div className="flex h-screen bg-gray-200">
