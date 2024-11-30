@@ -109,6 +109,14 @@ const ProfilePage = () => {
       const credential = EmailAuthProvider.credential(user.email, passwords.currentPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, passwords.newPassword);
+      // Reset the passwords state to clear the fields
+      setPasswords({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      // Optionally, clear any error messages
+    setError('');
       setPasswordModalOpen(true); // Open modal on success
     } catch (error) {
       setError(error.message);
@@ -182,20 +190,19 @@ const ProfilePage = () => {
       <div className="bg-white p-6 rounded-lg shadow-md mb-4 w-full">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
-        {['CurrentPassword', 'NewPassword', 'ConfirmPassword'].map((field, index) => (
-  <div className="flex items-center" key={index}>
-    <Lock className="mr-2" />
-    <input
-      type="password"
-      name={field}
-      value={passwords[field]}
-      onChange={handlePasswordChange}
-      className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300"
-      placeholder={field.replace(/([A-Z])/g, ' $1').replace(/Password/, ' Password')}
-    />
-  </div>
-))}
-
+        {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
+          <div className="flex items-center" key={index}>
+            <Lock className="mr-2" />
+            <input
+              type="password"
+              name={field} // Corrected name attribute
+              value={passwords[field] || ''} // Ensure state is properly accessed
+              onChange={handlePasswordChange}
+              className="border border-gray-300 rounded-md px-4 py-2 w-full focus:outline-none focus:ring focus:ring-blue-300"
+              placeholder={field.replace(/([A-Z])/g, ' $1')} // Adjust placeholder dynamically
+            />
+          </div>
+        ))}
           {error && <p className="text-red-500 text-center">{error}</p>}
         </div>
         <div className="mt-6 flex justify-end space-x-4">
