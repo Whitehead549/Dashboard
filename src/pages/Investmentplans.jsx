@@ -81,7 +81,7 @@ const SubscriptionPlanCard = ({ title, price, min, max, duration, roi, amount, o
 
 const InvestmentPlans = () => {
   const [amount, setAmount] = useState({
-    beginner: 0,
+    beginners: 0,
     advanced: 0,
     premium: 0,
   });
@@ -228,7 +228,7 @@ const InvestmentPlans = () => {
         const { firstName, lastName } = userData;
   
         const presentDate = new Date();
-        const durationDays = parseInt(plan === 'beginner' ? 10 : plan === 'advanced' ? 15 : 20);
+        const durationDays = parseInt(plan === 'beginners' ? 10 : plan === 'advanced' ? 15 : 20);
         const futureDate = new Date(presentDate);
         futureDate.setDate(futureDate.getDate() + durationDays);
   
@@ -301,9 +301,9 @@ useEffect(() => {
         max={999}
         duration="10 DAYS"
         roi={1}
-        amount={amount.beginner}
-        onAmountChange={(e) => handleInputChange(e, 'beginner')}
-        onInvest={() => handleInvest('beginner', 1, 'BEGINNERS PLAN', 100, 999)}
+        amount={amount.beginners}
+        onAmountChange={(e) => handleInputChange(e, 'beginners')}
+        onInvest={() => handleInvest('beginners', 1, 'BEGINNERS PLAN', 100, 999)}
       />
 
       <SubscriptionPlanCard 
