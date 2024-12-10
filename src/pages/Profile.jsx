@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Camera, Lock, Phone, Globe, UserPlus, UserSquare } from 'lucide-react';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../Config/Config'; // Adjust the import path
 
@@ -13,11 +12,9 @@ const ProfilePage = () => {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
-  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-  const storage = getStorage();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -41,37 +38,6 @@ const ProfilePage = () => {
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswords((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  const handleUploadPicture = async () => {
-    if (!file) {
-      setError('Please select an image file to upload.');
-      return;
-    }
-
-    setLoading(true);
-    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}`);
-    try {
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-
-      const userDocRef = query(collection(db, 'users'), where('uid', '==', auth.currentUser.uid));
-      const userDoc = await getDocs(userDocRef);
-      if (!userDoc.empty) {
-        await updateDoc(userDoc.docs[0].ref, { avatar: downloadURL });
-      }
-
-      setProfile((prev) => ({ ...prev, avatar: downloadURL }));
-      setAccountModalOpen(true); // Open modal on success
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleSaveProfile = async () => {
@@ -129,29 +95,7 @@ const ProfilePage = () => {
       {/* Account Settings Section */}
       <div className="bg-white p-6 rounded-lg shadow-md w-full mb-4 flex-grow">
         <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
-        <div className="flex flex-col md:flex-row items-center mb-6">
-          <img
-            src={profile.avatar || 'https://via.placeholder.com/150'} // Placeholder for default avatar
-            alt="Profile Avatar"
-            className="w-24 h-24 rounded-full border border-gray-300"
-          />
-          <div className="mt-4 md:mt-0 md:ml-4">
-            <label className="cursor-pointer flex items-center bg-gray-500 text-white px-2 py-2 rounded-md hover:bg-blue-700 transition mb-2">
-              <Camera className="mr-2" />
-              Select Photo
-              <input type="file" className="hidden" onChange={handleFileChange} />
-            </label>
-            <button
-              className={`bg-green-600 text-white px-4 py-2 rounded-lg ml-2 ${
-                loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700 transition'
-              }`}
-              onClick={handleUploadPicture}
-              disabled={loading}
-            >
-              {loading ? 'Uploading...' : 'Upload'}
-            </button>
-          </div>
-        </div>
+      
         <div className="space-y-4">
           {['username', 'firstName', 'lastName', 'email', 'phoneNumber', 'country'].map((field, index) => (
             <div className="flex items-center" key={index}>
@@ -190,7 +134,7 @@ const ProfilePage = () => {
       <div className="bg-white p-6 rounded-lg shadow-md mb-4 w-full">
         <h2 className="text-2xl font-semibold mb-4">Change Password</h2>
         <div className="space-y-4">
-        {['currentPassword', 'newPassword', 'confirmPassword'].map((field, index) => (
+        {['CurrentPassword', 'NewPassword', 'ConfirmPassword'].map((field, index) => (
           <div className="flex items-center" key={index}>
             <Lock className="mr-2" />
             <input
