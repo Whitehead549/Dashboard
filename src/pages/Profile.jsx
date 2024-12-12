@@ -7,9 +7,9 @@ import { auth, db } from '../Config/Config'; // Adjust the import path
 const ProfilePage = () => {
   const [profile, setProfile] = useState({});
   const [passwords, setPasswords] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    CurrentPassword: '',
+    NewPassword: '',
+    ConfirmPassword: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -55,12 +55,12 @@ const ProfilePage = () => {
 
 
   const handleSavePassword = async () => {
-    if (!passwords.currentPassword) {
+    if (!passwords.CurrentPassword) {
       setError('Current password is required!');
       return;
     }
   
-    if (passwords.newPassword !== passwords.confirmPassword) {
+    if (passwords.NewPassword !== passwords.ConfirmPassword) {
       setError('New passwords do not match!');
       return;
     }
@@ -72,14 +72,14 @@ const ProfilePage = () => {
         return;
       }
   
-      const credential = EmailAuthProvider.credential(user.email, passwords.currentPassword);
+      const credential = EmailAuthProvider.credential(user.email, passwords.CurrentPassword);
       await reauthenticateWithCredential(user, credential);
-      await updatePassword(user, passwords.newPassword);
+      await updatePassword(user, passwords.NewPassword);
       // Reset the passwords state to clear the fields
       setPasswords({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        CurrentPassword: '',
+        NewPassword: '',
+        ConfirmPassword: '',
       });
       // Optionally, clear any error messages
     setError('');

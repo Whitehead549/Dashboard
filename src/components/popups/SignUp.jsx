@@ -223,11 +223,11 @@ const Signup = () => {
           />
           <label htmlFor="terms" className="text-gray-700 text-sm">
            <span className="font-bold">I Agree To The </span> 
-            <a href="https://selmabriggswilson.com/termsandcondition/termsandcondition.html" target="_blank" className="text-blue-600 hover:underline">
+            <a href="https://www.selmabriggswilson.xyz/termsandconditions.html" target="_blank" className="text-blue-600 hover:underline">
                      Terms and Conditions
                 </a>
                 &nbsp;&&nbsp;
-                <a href="https://selmabriggswilson.com/privacy/privacy.html" target="_blank" className="text-blue-600 hover:underline">
+                <a href="https://www.selmabriggswilson.xyz/privacypolicy/privacypolicy.html" target="_blank" className="text-blue-600 hover:underline">
                     Privacy Policy
                 </a>.
           </label>
