@@ -23,7 +23,7 @@ const Header = ({ onSidebarToggle }) => {
         {/* Mobile Menu Button */}
         <button 
           onClick={onSidebarToggle} 
-          className="text-gray-500 text-2xl md:text-2xl font-semibold focus:outline-none md:hidden">
+          className="text-gray-800 text-2xl md:text-2xl font-semibold focus:outline-none md:hidden">
           &#9776;
         </button>
         
