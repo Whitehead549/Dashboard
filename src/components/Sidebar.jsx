@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaUser, FaMoneyBillWave, FaChartLine, FaHandHoldingUsd, FaHistory} from 'react-icons/fa'; // Import icons
+import { FaHome, FaUser, FaMoneyBillWave, FaChartLine, FaHandHoldingUsd, FaHistory, FaPhone} from 'react-icons/fa'; // Import icons
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -72,6 +72,12 @@ const Sidebar = ({ isOpen, onClose }) => {
               <FaHistory  className="mr-3" /> {/* Icon */}
               History
             </Link>
+          </li>
+          <li>
+          <a href="https://www.selmabriggswilson.xyz/contact.html" className="flex items-center px-4 py-2 hover:bg-gray-700 font-semibold text-lg py-3" onClick={onClose}>
+              <FaPhone className="mr-3" /> {/* Icon */}
+              Contact
+            </a>
           </li>
         </ul>
       </nav>
