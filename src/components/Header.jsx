@@ -18,12 +18,12 @@ const Header = ({ onSidebarToggle }) => {
 
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gray-100 shadow-md p-4 flex justify-between items-center z-50">
+    <header className="fixed top-0 left-0 w-full bg-gray-100 shadow-md p-2 flex justify-between items-center z-50">
       <div className="flex items-center">
         {/* Mobile Menu Button */}
         <button 
           onClick={onSidebarToggle} 
-          className="text-gray-500 focus:outline-none md:hidden">
+          className="text-gray-500 text-2xl md:text-2xl font-semibold focus:outline-none md:hidden">
           &#9776;
         </button>
         
