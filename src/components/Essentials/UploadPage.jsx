@@ -51,45 +51,46 @@ const UploadPage = ({ amount }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Ensure the user is authenticated
     const user = auth.currentUser;
     if (!user) {
       setUploadStatus('User not authenticated.');
       return;
     }
-
+  
     if (file) {
       try {
         // Start upload process
         setUploadStatus('Uploading...');
-        
+  
         // Upload the file to Appwrite Storage
         const response = await storage.createFile(
           '676abc3e0032948411a0', // Replace with your Appwrite bucket ID
           ID.unique(),
           file
         );
-
+  
+        // If upload is successful, get file details
         const fileId = response.$id;
         const fileUrl = storage.getFileView('676abc3e0032948411a0', fileId);
-
+  
         // Fetch user's firstName and lastName from the 'users' collection
         const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
         const userSnapshot = await getDocs(userQuery);
-
+  
         if (userSnapshot.empty) {
           setUploadStatus('User details not found.');
           return;
         }
-
+  
         const userData = userSnapshot.docs[0].data();
         const { firstName, lastName } = userData;
-
+  
         // Check if a deposit already exists for the user
         const depositQuery = query(collection(db, 'deposits'), where('uid', '==', user.uid));
         const depositSnapshot = await getDocs(depositQuery);
-
+  
         if (!depositSnapshot.empty) {
           const depositDoc = depositSnapshot.docs[0];
           await updateDoc(doc(db, 'deposits', depositDoc.id), {
@@ -111,7 +112,7 @@ const UploadPage = ({ amount }) => {
             createdAt: new Date(),
           });
         }
-
+  
         setUploadStatus('Upload successful! Deposit registered.');
         setFile(null); // Reset file input
       } catch (error) {
@@ -121,6 +122,7 @@ const UploadPage = ({ amount }) => {
       setUploadStatus('Please select a file before uploading.');
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-start md:p-8 max-w-xl w-full transition-transform duration-300 transform hover:scale-105 my-5 sm:my-5 md:my-5 lg:my-0">
