@@ -10,6 +10,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "aos": "^2.3.4",
+    "appwrite": "^16.1.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "firebase": "^10.12.2",

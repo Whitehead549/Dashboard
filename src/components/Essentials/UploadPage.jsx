@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../Config/Config'; // Ensure Firebase is correctly initialized
+import { Client, Storage, ID } from 'appwrite';
 
-const UploadPage = ({ amount,  onShowModal}) => {
-  const [transactionHash, setTransactionHash] = useState('');
-  const [saveStatus, setSaveStatus] = useState('');
+const UploadPage = ({ amount }) => {
+  const [file, setFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const [loading, setLoading] = useState(false);
 
+  // Initialize the Appwrite client
+  const client = new Client();
+  client
+    .setEndpoint('https://cloud.appwrite.io/v1') // Replace with your Appwrite endpoint
+    .setProject('676a890c003289725aee'); // Replace with your Appwrite project ID
+
+  const storage = new Storage(client);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setUploadStatus('File ready to upload');
+    }
+  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -19,64 +34,67 @@ const UploadPage = ({ amount,  onShowModal}) => {
     setDragActive(true);
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e) => {
+    e.preventDefault();
     setDragActive(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragActive(false);
-
-    // Retrieve the dropped text (e.g., transaction hash)
-    const text = e.dataTransfer.getData('text/plain');
-    if (text) {
-      setTransactionHash(text);
-      setSaveStatus('Transaction hash ready to save');
-    } else {
-      setSaveStatus('Invalid transaction hash. Please try again.');
+    const selectedFile = e.dataTransfer.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setUploadStatus('File ready to upload');
     }
-  };
-
-  const handleInputChange = (e) => {
-    setTransactionHash(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
-  
-    try {
-      // Ensure the user is authenticated
-      const user = auth.currentUser;
-      if (!user) {
-        onShowModal('You must be logged in to save a deposit.');
-        return;
-      }
-  
-      if (transactionHash.trim()) {
-        setSaveStatus('Saving deposit...');
-  
-        // Fetch user details
+
+    // Ensure the user is authenticated
+    const user = auth.currentUser;
+    if (!user) {
+      setUploadStatus('User not authenticated.');
+      return;
+    }
+
+    if (file) {
+      try {
+        // Start upload process
+        setUploadStatus('Uploading...');
+        
+        // Upload the file to Appwrite Storage
+        const response = await storage.createFile(
+          '676abc3e0032948411a0', // Replace with your Appwrite bucket ID
+          ID.unique(),
+          file
+        );
+
+        const fileId = response.$id;
+        const fileUrl = storage.getFileView('676abc3e0032948411a0', fileId);
+
+        // Fetch user's firstName and lastName from the 'users' collection
         const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
         const userSnapshot = await getDocs(userQuery);
-  
+
         if (userSnapshot.empty) {
-          onShowModal('User details not found in the database.');
+          setUploadStatus('User details not found.');
           return;
         }
-  
+
         const userData = userSnapshot.docs[0].data();
         const { firstName, lastName } = userData;
-  
-        // Check for existing deposit
+
+        // Check if a deposit already exists for the user
         const depositQuery = query(collection(db, 'deposits'), where('uid', '==', user.uid));
         const depositSnapshot = await getDocs(depositQuery);
-  
+
         if (!depositSnapshot.empty) {
           const depositDoc = depositSnapshot.docs[0];
           await updateDoc(doc(db, 'deposits', depositDoc.id), {
             amount,
-            transactionHash,
+            proofOfPayment: fileUrl,
             status: 'pending',
             firstName,
             lastName,
@@ -85,36 +103,31 @@ const UploadPage = ({ amount,  onShowModal}) => {
           await addDoc(collection(db, 'deposits'), {
             uid: user.uid,
             amount,
-            TotalAmount: 0,
-            transactionHash,
+            TotalAmount: 0, // Initial value for TotalAmount
+            proofOfPayment: fileUrl,
             status: 'pending',
             firstName,
             lastName,
             createdAt: new Date(),
           });
         }
-  
-        setTransactionHash('');
-        setSaveStatus('Deposit saved successfully!');
-        onShowModal('Your deposit has been saved successfully.');
-      } else {
-        onShowModal('Invalid or empty transaction hash. Please Enter Tx Hash');
+
+        setUploadStatus('Upload successful! Deposit registered.');
+        setFile(null); // Reset file input
+      } catch (error) {
+        setUploadStatus(`Upload failed: ${error.message}`);
       }
-    } catch (error) {
-      onShowModal(`Failed to save deposit: ${error.message}`);
-    } finally {
-      // Ensure loading is stopped regardless of success or error
-      setLoading(false);
+    } else {
+      setUploadStatus('Please select a file before uploading.');
     }
   };
-  
-  
+
   return (
     <div className="flex flex-col items-center justify-start md:p-8 max-w-xl w-full transition-transform duration-300 transform hover:scale-105 my-5 sm:my-5 md:my-5 lg:my-0">
       <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8">
-        {/* Transaction Hash Section */}
+        {/* Upload Proof of Payment Section */}
         <div className="bg-white shadow-md rounded-lg p-6 flex-grow">
-          <h3 className="text-xl font-semibold text-gray-900">Transaction Hash</h3>
+          <h3 className="text-xl font-semibold text-gray-900">Upload Proof of Payment</h3>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div
               className={`border-dashed border-2 p-6 rounded-lg text-center cursor-pointer hover:border-blue-600 transition duration-150 ${
@@ -125,28 +138,69 @@ const UploadPage = ({ amount,  onShowModal}) => {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
-              <textarea
-                value={transactionHash}
-                onChange={handleInputChange}
-                className="w-full h-24 border-none focus:outline-none resize-none"
-                placeholder="Enter Tx Hash."
+              <input
+                type="file"
+                id="fileInput"
+                accept="image/*,application/pdf"
+                onChange={handleFileChange}
+                className="hidden"
               />
+              <label htmlFor="fileInput" className="cursor-pointer">
+                {file ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="h-12 w-12 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
+                      />
+                    </svg>
+                    <span className="ml-3 text-sm text-gray-700">{file.name}</span>
+                  </div>
+                ) : (
+                  <div>
+                    <svg
+                      className="h-16 w-16 mx-auto text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    <p className="mt-2 text-sm text-gray-700">Drag and drop or click to upload</p>
+                  </div>
+                )}
+              </label>
             </div>
-            {saveStatus && (
+            {uploadStatus && (
               <p
                 className={`text-sm mt-2 ${
-                  saveStatus.includes('success') ? 'text-green-600' : 'text-red-600'
+                  uploadStatus.includes('success') ? 'text-green-600' : 'text-red-600'
                 }`}
               >
-                {saveStatus}
+                {uploadStatus}
               </p>
             )}
             <button
               type="submit"
-              className={`w-full bg-blue-700 text-white py-3 rounded-md hover:bg-blue-900 transition duration-150 ${loading && "opacity-50 cursor-not-allowed"}`}
-              disabled={loading}
+              className="w-full bg-blue-700 text-white py-3 rounded-md hover:bg-blue-900 transition duration-150"
             >
-              {loading ? "Saving..." : "Save Deposit"}
+              Upload
             </button>
           </form>
         </div>
