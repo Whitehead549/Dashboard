@@ -3,10 +3,11 @@ import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'fireb
 import { auth, db } from '../../Config/Config'; // Ensure Firebase is correctly initialized
 import { Client, Storage, ID } from 'appwrite';
 
-const UploadPage = ({ amount }) => {
+const UploadPage = ({ amount, onShowModal}) => {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [loading, setLoading] = useState(false); // This is where the loading state is initialized
 
   // Initialize the Appwrite client
   const client = new Client();
@@ -51,18 +52,20 @@ const UploadPage = ({ amount }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when the button is clicked
   
     // Ensure the user is authenticated
     const user = auth.currentUser;
     if (!user) {
-      setUploadStatus('User not authenticated.');
+      setLoading(false); // Reset loading if there's an error
+      onShowModal('User not authenticated.');
       return;
     }
   
     if (file) {
       try {
         // Start upload process
-        setUploadStatus('Uploading...');
+        setUploadStatus('Uploading your file. Please wait...');
   
         // Upload the file to Appwrite Storage
         const response = await storage.createFile(
@@ -80,7 +83,7 @@ const UploadPage = ({ amount }) => {
         const userSnapshot = await getDocs(userQuery);
   
         if (userSnapshot.empty) {
-          setUploadStatus('User details not found.');
+          onShowModal('User details not found in the database.');
           return;
         }
   
@@ -113,13 +116,18 @@ const UploadPage = ({ amount }) => {
           });
         }
   
-        setUploadStatus('Upload successful! Deposit registered.');
+        setUploadStatus('Upload successful!');
+        onShowModal('Your file has been uploaded successfully, and the deposit is registered.');
         setFile(null); // Reset file input
       } catch (error) {
-        setUploadStatus(`Upload failed: ${error.message}`);
+        setLoading(false); // Reset loading if form validation fails
+        onShowModal(`File upload failed: ${error.message}`);
+      } finally {
+        setLoading(false); // Always reset loading to false
       }
     } else {
-      setUploadStatus('Please select a file before uploading.');
+      setLoading(false); // Reset loading if form validation fails
+      onShowModal('Please select a file before uploading.');
     }
   };
   
@@ -198,12 +206,14 @@ const UploadPage = ({ amount }) => {
                 {uploadStatus}
               </p>
             )}
-            <button
-              type="submit"
-              className="w-full bg-blue-700 text-white py-3 rounded-md hover:bg-blue-900 transition duration-150"
-            >
-              Upload
-            </button>
+           <button
+            type="submit"
+            className={`w-full bg-blue-700 text-white py-3 rounded-md hover:bg-blue-900 transition duration-150 ${loading && "opacity-50 cursor-not-allowed"}`}
+            disabled={loading} // Button disabled when loading is true
+          >
+            {loading ? "Uploading..." : "Upload"}
+          </button>
+
           </form>
         </div>
       </div>
