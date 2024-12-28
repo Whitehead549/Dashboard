@@ -76,7 +76,7 @@ const UploadPage = ({ amount, onShowModal}) => {
   
         // If upload is successful, get file details
         const fileId = response.$id;
-        const fileUrl = storage.getFileView('6770453700013c9a128c', fileId);
+        const fileUrl = storage.getFileView('6770453700013c9a128c', fileId);  // Replace with your Appwrite bucket ID
   
         // Fetch user's firstName and lastName from the 'users' collection
         const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
