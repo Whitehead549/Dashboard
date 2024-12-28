@@ -69,14 +69,14 @@ const UploadPage = ({ amount, onShowModal}) => {
   
         // Upload the file to Appwrite Storage
         const response = await storage.createFile(
-          '677040bc00065d9eb0ed', // Replace with your Appwrite bucket ID
+          '6770453700013c9a128c', // Replace with your Appwrite bucket ID
           ID.unique(),
           file
         );
   
         // If upload is successful, get file details
         const fileId = response.$id;
-        const fileUrl = storage.getFileView('677040bc00065d9eb0ed', fileId);
+        const fileUrl = storage.getFileView('6770453700013c9a128c', fileId);
   
         // Fetch user's firstName and lastName from the 'users' collection
         const userQuery = query(collection(db, 'users'), where('uid', '==', user.uid));
